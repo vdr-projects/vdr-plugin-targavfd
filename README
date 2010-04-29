@@ -1,0 +1,120 @@
+This is a "plugin" for the Video Disk Recorder (VDR).
+
+Written by : Andreas Brachold <vdr07 AT deltab de>
+
+Project's homepage: 
+
+This plugin for VDR is free software: you can redistribute it and/or 
+modify it under the terms of the GNU General Public License as published 
+by the Free Software Foundation, version 3 of the License.
+
+This plugin for VDR is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this plugin for VDR. If not, see <http://www.gnu.org/licenses/>.
+
+See the file COPYING for license information.
+
+Description:
+------------
+targavfd is a plugin for the Video Disc Recorder and shows information
+about the current state of VDR on Targa USB Graphic Vacuum Fluorescent Display.
+
+
+Install libhid:
+-------------------------------------
+You need installed library libhid to use the vdr-plugin-targavfd.
+This library libhid is used to access and interact with a USB HID device.
+
+1. http://libhid.alioth.debian.org/
+
+Install vdr-plugin-targavfd:
+---------------------------
+Unpack the vdr-targavfd tarball to $VDRSOURCE/PLUGINS/src directory.
+Variable $VDRSOURCE stands for a directory, where source archive of VDR package 
+was be decompressed.
+
+#> cd $VDRSOURCE/PLUGINS/src
+#> tar -xzvf vdr-targavfd-0.0.1.tgz
+#> ln -s targavfd-0.0.1 targavfd
+
+Compile the plugin (from VDR's source directory)
+
+Change the working directory to VDR source root and compile this plugin 
+like all other VDR plugins.
+
+#> cd $VDRSOURCE
+#> make plugins
+
+After everything has been compiled without errors, copy the plugin to their 
+target directory.
+
+#> make install
+
+
+Check follow requirements 
+-------------------------
+* Device still detected and writable
+
+  #> lsusb -vd 19c2:6a11 | grep iProduct
+  iProduct                2 Targa USB Graphic Vacuum Fluorescent Display
+
+* Add a udev permission rule, if required (writable for group vdr) e.g.
+  /etc/udev/rules.d/92-vfd.rules
+  ACTION=="add", BUS=="usb", SYSFS{idVendor}=="19c2", SYSFS{idProduct}=="6a11", GROUP="vdr"
+
+Start VDR with the plugin.
+---------------------------
+   Examples:
+     vdr -P'targavfd'
+
+Setup options
+-------------
+This options are editable at run time. (Menu: Setup > Plugin > targavfd ... )
+
+* Brightness 
+  - Set brightness from display. (Default: 1)
+
+* Default font 
+  - Used font, there should installed like other FreeType supported fonts 
+
+* Exit mode
+  - Do nothing - Just leave the "last" message there
+  - Showing clock - Show the big clock
+  - Turning display off - Blank the device completely
+  - Show next timer - Show time and title of next timer
+
+
+Plugin SVDRP commands
+---------------------
+* HELP - List known commands
+* OFF - Suspend driver of display.
+* ON  - Resume driver of display.
+* ICON [name] [on|off|auto] - Force state of icon. 
+
+Use this commands like follow samples 
+    #> svdrpsend.pl PLUG targavfd OFF
+    220 vdr SVDRP VideoDiskRecorder ....
+    250 driver suspended
+    221 vdr closing connection
+
+    #> svdrpsend.pl PLUG targavfd HELP ICON
+    214-ICON [name] [on|off|auto]
+    214-    Force state of icon. Names of icons are:
+    214-    Play,Pause,Record,Message,Message,Mute...
+
+This commands can have follow responses 
+OFF :   250 driver suspended           
+        251 driver already suspended
+ON :    250 driver resumed
+        251 driver already resumed
+        554 driver could not resumed
+ICON :  250 icon state 'auto'
+        251 icon state 'on'
+        252 icon state 'off'
+*       501 unknown command
+
+

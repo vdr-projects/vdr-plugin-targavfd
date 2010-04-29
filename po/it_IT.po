@@ -1,0 +1,61 @@
+# vdr-targavfd-plugin language source file.
+# Copyright (C) Diego Pierotto <vdr-italian at tiscali.it>
+# This file is distributed under the same license as the PACKAGE package.
+# Diego Pierotto <vdr-italian at tiscali.it> 2009
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: vdr-targavfd-plugin 0.0.1\n"
+"Report-Msgid-Bugs-To: <see README>\n"
+"POT-Creation-Date: 2010-04-17 11:55+0200\n"
+"PO-Revision-Date: 2009-06-07 23:30+0100\n"
+"Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Italian\n"
+"X-Poedit-Country: ITALY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+msgid "targavfd"
+msgstr "TargaVFD"
+
+msgid "Brightness"
+msgstr ""
+
+msgid "Default font"
+msgstr "Carattere predefinito"
+
+msgid "Render mode"
+msgstr ""
+
+msgid "Single line"
+msgstr ""
+
+msgid "Dual lines"
+msgstr ""
+
+msgid "Do nothing"
+msgstr "Non fare nulla"
+
+msgid "Showing clock"
+msgstr "Mostra orologio"
+
+msgid "Turning display off"
+msgstr "Spegni retroilluminazione"
+
+msgid "Show next timer"
+msgstr "Mostra prossimo timer"
+
+msgid "Exit mode"
+msgstr "Modalità d'uscita"
+
+msgid "Control a targa vfd"
+msgstr "Controlla un VFD targa"
+
+msgid "None active timer"
+msgstr "Nessun timer attivo"
+
+msgid "Unknown title"
+msgstr "Titolo sconosciuto"
