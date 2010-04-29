@@ -1,14 +1,14 @@
 # vdr-targavfd-plugin language source file.
 # Copyright (C) Andreas Brachold <vdr07 AT deltab de>
 # This file is distributed under the same license as the PACKAGE package.
-# Andreas Brachold <vdr07 AT deltab de> 2009
 #
+# Andreas Brachold <vdr07 AT deltab de> 2009, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: vdr-targavfd-plugin 0.0.1\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-04-17 11:55+0200\n"
-"PO-Revision-Date: 2009-05-21 17:13+0200\n"
+"POT-Creation-Date: 2010-04-18 17:28+0200\n"
+"PO-Revision-Date: 2010-04-18 18:22+0200\n"
 "Last-Translator: Andreas Brachold <vdr07 AT deltab de>\n"
 "Language-Team: Andreas Brachold <vdr07 AT deltab de>\n"
 "MIME-Version: 1.0\n"
@@ -21,9 +21,6 @@ msgstr "TargaVFD"
 msgid "Brightness"
 msgstr "Helligkeit"
 
-msgid "Default font"
-msgstr "Zeichensatz"
-
 msgid "Render mode"
 msgstr "Anzeigemodus"
 
@@ -32,6 +29,15 @@ msgstr "Einzelne Zeile"
 
 msgid "Dual lines"
 msgstr "Zwei Zeilen"
+
+msgid "Default font"
+msgstr "Zeichensatz"
+
+msgid "Height of big font"
+msgstr "Höhe des großen Zeichensatzes"
+
+msgid "Height of small font"
+msgstr "Höhe des kleinen Zeichensatzes"
 
 msgid "Do nothing"
 msgstr "Nichts unternehmen"

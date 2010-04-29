@@ -29,6 +29,8 @@
 #define DEFAULT_HEIGHT       16
 #define DEFAULT_FONT         "Sans:Bold"
 #define DEFAULT_TWO_LINE_MODE	0
+#define DEFAULT_BIG_FONT_HEIGHT   14
+#define DEFAULT_SMALL_FONT_HEIGHT 7
 
 /// The one and only Stored setup data
 cVFDSetup theSetup;
@@ -41,6 +43,8 @@ cVFDSetup::cVFDSetup(void)
   m_nOnExit = DEFAULT_ON_EXIT;
   m_nBrightness = DEFAULT_BRIGHTNESS;
   m_bTwoLineMode = DEFAULT_TWO_LINE_MODE;
+  m_nBigFontHeight = DEFAULT_BIG_FONT_HEIGHT;
+  m_nSmallFontHeight = DEFAULT_SMALL_FONT_HEIGHT;
 
   strncpy(m_szFont,DEFAULT_FONT,sizeof(m_szFont));
 }
@@ -58,6 +62,8 @@ cVFDSetup& cVFDSetup::operator = (const cVFDSetup& x)
   m_nBrightness = x.m_nBrightness;
 
   m_bTwoLineMode = x.m_bTwoLineMode;
+  m_nBigFontHeight = x.m_nBigFontHeight;
+  m_nSmallFontHeight = x.m_nSmallFontHeight;
 
   strncpy(m_szFont,x.m_szFont,sizeof(m_szFont));
 
@@ -105,6 +111,28 @@ bool cVFDSetup::SetupParse(const char *szName, const char *szValue)
     strncpy(m_szFont,DEFAULT_FONT,sizeof(m_szFont));
     return true;
   }
+  // BigFont
+  if(!strcasecmp(szName, "BigFont")) {
+    int n = atoi(szValue);
+    if ((n < 5) || (n > 24)) {
+		    esyslog("targaVFD:  BigFont must be between 5 and 24; using default %d",
+		           DEFAULT_BIG_FONT_HEIGHT);
+		    n = DEFAULT_BIG_FONT_HEIGHT;
+    }
+    m_nBigFontHeight = n;
+    return true;
+  }
+  // SmallFont
+  if(!strcasecmp(szName, "SmallFont")) {
+    int n = atoi(szValue);
+    if ((n < 5) || (n > 24)) {
+		    esyslog("targaVFD:  SmallFont must be between 5 and 24; using default %d",
+		           DEFAULT_SMALL_FONT_HEIGHT);
+		    n = DEFAULT_SMALL_FONT_HEIGHT;
+    }
+    m_nSmallFontHeight = n;
+    return true;
+  }
 
   // Two Line Mode
   if(!strcasecmp(szName, "TwoLineMode")) {
@@ -136,6 +164,8 @@ void cVFDMenuSetup::Store(void)
   SetupStore("OnExit",     theSetup.m_nOnExit);
   SetupStore("Brightness", theSetup.m_nBrightness);
   SetupStore("Font",       theSetup.m_szFont);
+  SetupStore("BigFont", theSetup.m_nBigFontHeight);
+  SetupStore("SmallFont", theSetup.m_nSmallFontHeight);
   SetupStore("TwoLineMode",theSetup.m_bTwoLineMode);
 }
 
@@ -152,13 +182,18 @@ cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
   Add(new cMenuEditIntItem (tr("Brightness"),           
         &m_tmpSetup.m_nBrightness,        
         0, 2));
-
-  Add(new cMenuEditStraItem(tr("Default font"),           
-        &fontIndex, fontNames.Size(), &fontNames[0]));
-
   Add(new cMenuEditBoolItem(tr("Render mode"),                    
         &m_tmpSetup.m_bTwoLineMode,    
         tr("Single line"), tr("Dual lines")));
+
+  Add(new cMenuEditStraItem(tr("Default font"),           
+        &fontIndex, fontNames.Size(), &fontNames[0]));
+  Add(new cMenuEditIntItem (tr("Height of big font"),           
+        &m_tmpSetup.m_nBigFontHeight,        
+        5, 24));
+  Add(new cMenuEditIntItem (tr("Height of small font"),           
+        &m_tmpSetup.m_nSmallFontHeight,        
+        5, 24));
 
   static const char * szExitModes[eOnExitMode_LASTITEM];
   szExitModes[eOnExitMode_SHOWMSG]      = tr("Do nothing");
@@ -177,8 +212,14 @@ eOSState cVFDMenuSetup::ProcessKey(eKeys nKey)
     // Store edited Values
     Utf8Strn0Cpy(m_tmpSetup.m_szFont, fontNames[fontIndex], sizeof(m_tmpSetup.m_szFont));
     if (0 != strcmp(m_tmpSetup.m_szFont, theSetup.m_szFont)
-        || m_tmpSetup.m_bTwoLineMode != theSetup.m_bTwoLineMode) {
-        m_pDev->SetFont(m_tmpSetup.m_szFont, m_tmpSetup.m_bTwoLineMode);
+        || m_tmpSetup.m_bTwoLineMode != theSetup.m_bTwoLineMode
+        || (!m_tmpSetup.m_bTwoLineMode && (m_tmpSetup.m_nBigFontHeight != theSetup.m_nBigFontHeight))
+        || ( m_tmpSetup.m_bTwoLineMode && (m_tmpSetup.m_nSmallFontHeight != theSetup.m_nSmallFontHeight))
+      ) {
+        m_pDev->SetFont(m_tmpSetup.m_szFont, 
+                        m_tmpSetup.m_bTwoLineMode, 
+                        m_tmpSetup.m_nBigFontHeight, 
+                        m_tmpSetup.m_nSmallFontHeight);
     }
 	}
   return cMenuSetupPage::ProcessKey(nKey);

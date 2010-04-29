@@ -120,7 +120,7 @@ public:
   void OsdCurrentItem(const char *sz);
   void OsdStatusMessage(const char *sz);
 
-  virtual bool SetFont(const char *szFont, int bTwoLineMode);
+  virtual bool SetFont(const char *szFont, int bTwoLineMode, int nBigFontHeight, int nSmallFontHeight);
 
   eIconState ForceIcon(unsigned int nIcon, eIconState nState);
 };

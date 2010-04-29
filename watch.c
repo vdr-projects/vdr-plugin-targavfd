@@ -17,6 +17,7 @@
 
 #include "watch.h"
 #include "setup.h"
+#include "ffont.h"
 
 #include <vdr/tools.h>
 
@@ -206,10 +207,9 @@ void cVFDWatch::Action(void)
       // every second the clock need updates.
 	    if (theSetup.m_bTwoLineMode) {
         if((0 == (nCnt % 5))) {
-          if(m_eWatchMode == eLiveTV) {
-            bReDraw = CurrentTime();
-          } else {
-            bReDraw = ReplayTime();
+          bReDraw = CurrentTime();
+          if(m_eWatchMode != eLiveTV) {
+            bReDraw |= ReplayTime();
           }
         }
       }
@@ -292,6 +292,8 @@ bool cVFDWatch::RenderScreen(bool bReDraw) {
     cString* scRender;
     cString* scHeader = NULL;
     bool bForce = m_bUpdateScreen;
+    bool bAllowCurrentTime = false;
+
     if(osdMessage) {
       scRender = osdMessage;
     } else if(osdItem) {
@@ -302,9 +304,10 @@ bool cVFDWatch::RenderScreen(bool bReDraw) {
         if(Program()) {
           bForce = true;
         }
-        if(chPresentTitle)
+        if(chPresentTitle) {
           scRender = chPresentTitle;
-        else {
+          bAllowCurrentTime = true;
+        } else {
           scHeader = currentTime;
           scRender = chName;
         }
@@ -314,6 +317,7 @@ bool cVFDWatch::RenderScreen(bool bReDraw) {
         }
         scHeader = replayTime;
         scRender = replayTitle;
+        bAllowCurrentTime = true;
     }
 
 
@@ -328,9 +332,10 @@ bool cVFDWatch::RenderScreen(bool bReDraw) {
     
         int iRet = -1;
         if(theSetup.m_bTwoLineMode) {
-          iRet = this->DrawText(0 - m_nScrollOffset,8, *scRender);
+          iRet = this->DrawText(0 - m_nScrollOffset,pFont->Height(), *scRender);
         } else {
-          iRet = this->DrawText(0 - m_nScrollOffset,0, *scRender);
+          int nTop = (theSetup.m_cHeight - pFont->Height())/2;
+          iRet = this->DrawText(0 - m_nScrollOffset,nTop<0?0:nTop, *scRender);
         }
         if(m_bScrollNeeded) {
           switch(iRet) {
@@ -359,6 +364,13 @@ bool cVFDWatch::RenderScreen(bool bReDraw) {
       }
 
       if(scHeader && theSetup.m_bTwoLineMode) {
+        if(bAllowCurrentTime && currentTime) {
+          int t = pFont->Width(*currentTime);
+          int w = pFont->Width(*scHeader);
+          if((w + t + 3) < theSetup.m_cWidth && t < theSetup.m_cWidth) {
+            this->DrawText(theSetup.m_cWidth - t, 0, *currentTime);
+          } 
+        }
         this->DrawText(0, 0, *scHeader);
       }
 
@@ -835,9 +847,9 @@ void cVFDWatch::OsdStatusMessage(const char *sz)
     }
 }
 
-bool cVFDWatch::SetFont(const char *szFont, int bTwoLineMode) {
+bool cVFDWatch::SetFont(const char *szFont, int bTwoLineMode, int nBigFontHeight, int nSmallFontHeight) {
     cMutexLooker m(mutex);
-    if(cVFD::SetFont(szFont, bTwoLineMode)) {
+    if(cVFD::SetFont(szFont, bTwoLineMode, nBigFontHeight, nSmallFontHeight)) {
       m_bUpdateScreen = true;
       return true;
     }

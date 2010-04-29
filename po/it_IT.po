@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-targavfd-plugin 0.0.1\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-04-17 11:55+0200\n"
+"POT-Creation-Date: 2010-04-18 17:28+0200\n"
 "PO-Revision-Date: 2009-06-07 23:30+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: \n"
@@ -24,9 +24,6 @@ msgstr "TargaVFD"
 msgid "Brightness"
 msgstr ""
 
-msgid "Default font"
-msgstr "Carattere predefinito"
-
 msgid "Render mode"
 msgstr ""
 
@@ -34,6 +31,15 @@ msgid "Single line"
 msgstr ""
 
 msgid "Dual lines"
+msgstr ""
+
+msgid "Default font"
+msgstr "Carattere predefinito"
+
+msgid "Height of big font"
+msgstr ""
+
+msgid "Height of small font"
 msgstr ""
 
 msgid "Do nothing"

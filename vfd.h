@@ -67,12 +67,12 @@ private:
 
 class cVFD : public cVFDQueue {
 
-  cVFDFont*   pFont;
 	/* framebuffer and backingstore for current contents */
 	cVFDBitmap* framebuf;
 	cVFDBitmap* backingstore;
   unsigned int lastIconState;
 protected:
+  cVFDFont*   pFont;
 
   bool SendCmdClock();
   bool SendCmdShutdown();
@@ -90,7 +90,7 @@ public:
   bool flush ();
 
   void icons(unsigned int state);
-  virtual bool SetFont(const char *szFont, int m_bTwoLineMode);
+  virtual bool SetFont(const char *szFont, int bTwoLineMode, int nBigFontHeight, int nSmallFontHeight);
 };
 
 

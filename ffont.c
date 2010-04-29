@@ -83,10 +83,10 @@ cVFDFont::cVFDFont(const char *Name, int CharHeight, int CharWidth)
            }
         else {
            error = FT_Set_Char_Size(face, // handle to face object
-                                    CharWidth * 64,  // CharWidth in 1/64th of points
-                                    CharHeight * 64, // CharHeight in 1/64th of points
-                                    0,    // horizontal device resolution
-                                    0);   // vertical device resolution
+                                    CharWidth  << 6, // CharWidth in 1/64th of points
+                                    CharHeight << 6, // CharHeight in 1/64th of points
+                                    CharWidth > 8 ? 64 : 80,    // horizontal device resolution
+                                    72);   // vertical device resolution
            if (!error) {
               height = ((face->size->metrics.ascender-face->size->metrics.descender) + 63) / 64;
               bottom = abs((face->size->metrics.descender - 63) / 64);
