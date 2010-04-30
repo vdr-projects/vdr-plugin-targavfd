@@ -173,6 +173,7 @@ void cVFDWatch::close() {
       } 
       case eOnExitMode_SHOWCLOCK: {
         isyslog("targaVFD: closing, showing clock.");
+        icons(0);
         SendCmdClock();
         break;
       } 
