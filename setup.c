@@ -179,9 +179,15 @@ cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
   fontNames.Insert(strdup(DEFAULT_FONT));
   fontIndex = max(0, fontNames.Find(m_tmpSetup.m_szFont));
 
-  Add(new cMenuEditIntItem (tr("Brightness"),           
-        &m_tmpSetup.m_nBrightness,        
-        0, 2));
+  static const char * szBrightness[3];
+  szBrightness[0] = tr("Show nothing");
+  szBrightness[1] = tr("Half brightness");
+  szBrightness[2] = tr("Full brightness");
+
+  Add(new cMenuEditStraItem (tr("Brightness"),           
+        &m_tmpSetup.m_nBrightness,
+        memberof(szBrightness), szBrightness));
+
   Add(new cMenuEditBoolItem(tr("Render mode"),                    
         &m_tmpSetup.m_bTwoLineMode,    
         tr("Single line"), tr("Dual lines")));

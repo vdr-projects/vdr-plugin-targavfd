@@ -244,7 +244,7 @@ const char *cVFDQueue::hiderror(hid_return ret) const
 
 cVFD::cVFD() 
 {
-  this->pFont = NULL;
+	this->pFont = NULL;
 	this->lastIconState = 0;
 }
 
@@ -278,14 +278,14 @@ bool cVFD::open()
 		esyslog("targaVFD: unable to allocate framebuffer");
 		return false;
 	}
+    m_iSizeYb = ((theSetup.m_cHeight + 7) / 8);
 
 	/* Make sure the framebuffer backing store is there... */
-	this->backingstore = new cVFDBitmap(theSetup.m_cWidth,theSetup.m_cHeight);
+	this->backingstore = new unsigned char[theSetup.m_cWidth * m_iSizeYb];
 	if (this->backingstore == NULL) {
 		esyslog("targaVFD: unable to create framebuffer backing store");
 		return false;
 	}
-  backingstore->SetPixel(0,0);//make dirty
 
 	this->lastIconState = 0;
 
@@ -368,34 +368,63 @@ void cVFD::clear()
 
 
 /**
- * Flush data on screen to the LCD.
+ * Flush cached bitmap data and submit changes rows to the Display.
  */
-bool cVFD::flush()
-{
-	/*
-	 * The display only provides for a complete screen refresh. If
-	 * nothing has changed, don't refresh.
-	 */
-  if (!((*backingstore) == (*framebuf))) {
-	  /* send buffer for one command or display data */
-    const uchar* fb = framebuf->getBitmap();
-	  int bytes = framebuf->Width() * framebuf->Height() / 8;
-	  int width = framebuf->Width();
-    QueueCmd(CMD_SETRAM);
-    QueueData(0);
-    QueueCmd(CMD_SETPIXEL);
-    QueueData(bytes);
-    for (int i=0;i<width;i+=1)
-    {
-       QueueData(*(fb + i));
-       QueueData(*(fb + (i + width)));
-	  }
-	  /* Update the backing store. */
-    (*backingstore) = (*framebuf);
-  }
-  return QueueFlush();
-}
 
+bool cVFD::flush(bool refreshAll)
+{
+    unsigned int n, x, yb;
+
+    if (!backingstore || !framebuf)
+        return false;
+
+	const uchar* fb = framebuf->getBitmap();
+	const unsigned int width = framebuf->Width();
+
+    bool doRefresh = false;
+    unsigned int minX = width;
+    unsigned int maxX = 0;
+
+    for (yb = 0; yb < m_iSizeYb; ++yb)
+        for (x = 0; x < width; ++x)
+        {
+            n = x + (yb * width);
+            if (*(fb + n) != *(backingstore + n))
+            {
+                *(backingstore + n) = *(fb + n);
+                minX = min(minX, x);
+                maxX = max(maxX, x + 1);
+                doRefresh = true;
+            }
+        }
+
+    if (refreshAll || doRefresh)
+    {
+        if (refreshAll) {
+            minX = 0;
+            maxX = width;
+         }
+
+        maxX = min(maxX, width);
+
+		unsigned int nData = (maxX-minX) * m_iSizeYb;
+		if(nData) {
+		    // send data to display, controller
+			QueueCmd(CMD_SETRAM);
+			QueueData(minX*m_iSizeYb);
+			QueueCmd(CMD_SETPIXEL);
+			QueueData(nData);
+
+		    for (x = minX; x < maxX; ++x)
+			    for (yb = 0; yb < m_iSizeYb; ++yb)
+		        {
+		            n = x + (yb * width);
+		            QueueData((*(backingstore + n)));
+		        }
+		}
+    }
+	return QueueFlush();
+}
 
 /**
  * Print a string on the screen at position (x,y).

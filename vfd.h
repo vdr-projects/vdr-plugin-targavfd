@@ -69,8 +69,10 @@ class cVFD : public cVFDQueue {
 
 	/* framebuffer and backingstore for current contents */
 	cVFDBitmap* framebuf;
-	cVFDBitmap* backingstore;
-  unsigned int lastIconState;
+	unsigned char * backingstore;
+	unsigned int lastIconState;
+	unsigned int m_iSizeYb;
+
 protected:
   cVFDFont*   pFont;
 
@@ -87,7 +89,7 @@ public:
 
   void clear ();
   int DrawText(int x, int y, const char* string);
-  bool flush ();
+  bool flush (bool refreshAll = true);
 
   void icons(unsigned int state);
   virtual bool SetFont(const char *szFont, int bTwoLineMode, int nBigFontHeight, int nSmallFontHeight);

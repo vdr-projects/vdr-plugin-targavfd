@@ -158,7 +158,7 @@ void cVFDWatch::close() {
           this->DrawText(0,0,tr("None active timer"));
           this->icons(0);
         }
-        this->flush();
+        this->flush(true);
         break;
       }
       case eOnExitMode_SHOWMSG: {
@@ -205,9 +205,9 @@ void cVFDWatch::Action(void)
       cMutexLooker m(mutex);
       runTime.Set();
 
-      // every second the clock need updates.
-	    if (theSetup.m_bTwoLineMode) {
-        if((0 == (nCnt % 5))) {
+	// every second the clock need updates.
+	if (theSetup.m_bTwoLineMode) {
+        if((0 == (nCnt % 2))) {
           bReDraw = CurrentTime();
           if(m_eWatchMode != eLiveTV) {
             bReDraw |= ReplayTime();
@@ -277,7 +277,7 @@ void cVFDWatch::Action(void)
       }
 
       if(bFlush) {
-        flush();
+        flush(false);
       }
     }
     int nDelay = 100 - runTime.Elapsed();

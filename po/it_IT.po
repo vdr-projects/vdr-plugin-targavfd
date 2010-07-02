@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-targavfd-plugin 0.0.1\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-04-18 17:28+0200\n"
+"POT-Creation-Date: 2010-07-02 21:25+0200\n"
 "PO-Revision-Date: 2009-06-07 23:30+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: \n"
@@ -21,8 +21,17 @@ msgstr ""
 msgid "targavfd"
 msgstr "TargaVFD"
 
+msgid "Show nothing"
+msgstr "Non fare visualizzare"
+
+msgid "Half brightness"
+msgstr "Mezzora luminosità"
+
+msgid "Full brightness"
+msgstr "Completa luminosità"
+
 msgid "Brightness"
-msgstr ""
+msgstr "Luminosità"
 
 msgid "Render mode"
 msgstr ""

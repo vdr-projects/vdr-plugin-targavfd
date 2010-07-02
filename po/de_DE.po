@@ -5,10 +5,10 @@
 # Andreas Brachold <vdr07 AT deltab de> 2009, 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-targavfd-plugin 0.0.1\n"
+"Project-Id-Version: vdr-targavfd-plugin 0.0.5\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-04-18 17:28+0200\n"
-"PO-Revision-Date: 2010-04-18 18:22+0200\n"
+"POT-Creation-Date: 2010-07-02 21:25+0200\n"
+"PO-Revision-Date: 2010-07-02 21:25+0200\n"
 "Last-Translator: Andreas Brachold <vdr07 AT deltab de>\n"
 "Language-Team: Andreas Brachold <vdr07 AT deltab de>\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +17,15 @@ msgstr ""
 
 msgid "targavfd"
 msgstr "TargaVFD"
+
+msgid "Show nothing"
+msgstr "Nichts anzeigen"
+
+msgid "Half brightness"
+msgstr "Halbe Helligkeit"
+
+msgid "Full brightness"
+msgstr "Volle Helligkeit"
 
 msgid "Brightness"
 msgstr "Helligkeit"
