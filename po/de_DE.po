@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-targavfd-plugin 0.0.5\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-07-02 21:25+0200\n"
+"POT-Creation-Date: 2010-07-11 15:53+0200\n"
 "PO-Revision-Date: 2010-07-02 21:25+0200\n"
 "Last-Translator: Andreas Brachold <vdr07 AT deltab de>\n"
 "Language-Team: Andreas Brachold <vdr07 AT deltab de>\n"
@@ -62,6 +62,18 @@ msgstr "Nächsten Timer anzeigen"
 
 msgid "Exit mode"
 msgstr "Ende Modus"
+
+msgid "Never"
+msgstr "Nie"
+
+msgid "Timed"
+msgstr "Zeitlich"
+
+msgid "Ever"
+msgstr "Immer"
+
+msgid "Show volume bargraph"
+msgstr "Lautstärkebargraph anzeigen"
 
 msgid "Control a targa vfd"
 msgstr "Steuert ein Targa VFD"

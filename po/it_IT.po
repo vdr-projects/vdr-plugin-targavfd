@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-targavfd-plugin 0.0.1\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-07-02 21:25+0200\n"
+"POT-Creation-Date: 2010-07-11 15:53+0200\n"
 "PO-Revision-Date: 2009-06-07 23:30+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: \n"
@@ -65,6 +65,18 @@ msgstr "Mostra prossimo timer"
 
 msgid "Exit mode"
 msgstr "Modalità d'uscita"
+
+msgid "Never"
+msgstr ""
+
+msgid "Timed"
+msgstr ""
+
+msgid "Ever"
+msgstr ""
+
+msgid "Show volume bargraph"
+msgstr ""
 
 msgid "Control a targa vfd"
 msgstr "Controlla un VFD targa"

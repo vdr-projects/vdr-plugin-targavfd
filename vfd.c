@@ -373,57 +373,56 @@ void cVFD::clear()
 
 bool cVFD::flush(bool refreshAll)
 {
-    unsigned int n, x, yb;
+  unsigned int n, x, yb;
 
-    if (!backingstore || !framebuf)
-        return false;
+  if (!backingstore || !framebuf)
+      return false;
 
-	const uchar* fb = framebuf->getBitmap();
-	const unsigned int width = framebuf->Width();
+  const uchar* fb = framebuf->getBitmap();
+  const unsigned int width = framebuf->Width();
 
-    bool doRefresh = false;
-    unsigned int minX = width;
-    unsigned int maxX = 0;
+  bool doRefresh = false;
+  unsigned int minX = width;
+  unsigned int maxX = 0;
 
-    for (yb = 0; yb < m_iSizeYb; ++yb)
-        for (x = 0; x < width; ++x)
+  for (yb = 0; yb < m_iSizeYb; ++yb)
+      for (x = 0; x < width; ++x)
+      {
+          n = x + (yb * width);
+          if (*(fb + n) != *(backingstore + n))
+          {
+              *(backingstore + n) = *(fb + n);
+              minX = min(minX, x);
+              maxX = max(maxX, x + 1);
+              doRefresh = true;
+          }
+      }
+
+  if (refreshAll || doRefresh) {
+    if (refreshAll) {
+      minX = 0;
+      maxX = width;
+    }
+
+    maxX = min(maxX, width);
+
+	  unsigned int nData = (maxX-minX) * m_iSizeYb;
+	  if(nData) {
+	    // send data to display, controller
+		QueueCmd(CMD_SETRAM);
+		QueueData(minX*m_iSizeYb);
+		QueueCmd(CMD_SETPIXEL);
+		QueueData(nData);
+
+    for (x = minX; x < maxX; ++x)
+	    for (yb = 0; yb < m_iSizeYb; ++yb)
         {
             n = x + (yb * width);
-            if (*(fb + n) != *(backingstore + n))
-            {
-                *(backingstore + n) = *(fb + n);
-                minX = min(minX, x);
-                maxX = max(maxX, x + 1);
-                doRefresh = true;
-            }
+            QueueData((*(backingstore + n)));
         }
-
-    if (refreshAll || doRefresh)
-    {
-        if (refreshAll) {
-            minX = 0;
-            maxX = width;
-         }
-
-        maxX = min(maxX, width);
-
-		unsigned int nData = (maxX-minX) * m_iSizeYb;
-		if(nData) {
-		    // send data to display, controller
-			QueueCmd(CMD_SETRAM);
-			QueueData(minX*m_iSizeYb);
-			QueueCmd(CMD_SETPIXEL);
-			QueueData(nData);
-
-		    for (x = minX; x < maxX; ++x)
-			    for (yb = 0; yb < m_iSizeYb; ++yb)
-		        {
-		            n = x + (yb * width);
-		            QueueData((*(backingstore + n)));
-		        }
 		}
-    }
-	return QueueFlush();
+  }
+  return QueueFlush();
 }
 
 /**

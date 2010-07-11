@@ -31,6 +31,7 @@
 #define DEFAULT_TWO_LINE_MODE	0
 #define DEFAULT_BIG_FONT_HEIGHT   14
 #define DEFAULT_SMALL_FONT_HEIGHT 7
+#define DEFAULT_VOLUME_MODE 	eVolumeMode_ShowEver    /**< Show the volume bar ever */
 
 /// The one and only Stored setup data
 cVFDSetup theSetup;
@@ -45,6 +46,7 @@ cVFDSetup::cVFDSetup(void)
   m_bTwoLineMode = DEFAULT_TWO_LINE_MODE;
   m_nBigFontHeight = DEFAULT_BIG_FONT_HEIGHT;
   m_nSmallFontHeight = DEFAULT_SMALL_FONT_HEIGHT;
+  m_nVolumeMode = DEFAULT_VOLUME_MODE;
 
   strncpy(m_szFont,DEFAULT_FONT,sizeof(m_szFont));
 }
@@ -64,6 +66,8 @@ cVFDSetup& cVFDSetup::operator = (const cVFDSetup& x)
   m_bTwoLineMode = x.m_bTwoLineMode;
   m_nBigFontHeight = x.m_nBigFontHeight;
   m_nSmallFontHeight = x.m_nSmallFontHeight;
+
+  m_nVolumeMode = x.m_nVolumeMode;
 
   strncpy(m_szFont,x.m_szFont,sizeof(m_szFont));
 
@@ -151,6 +155,19 @@ bool cVFDSetup::SetupParse(const char *szName, const char *szValue)
     }
     return true;
   }
+
+  // VolumeMode
+  if(!strcasecmp(szName, "VolumeMode")) {
+    int n = atoi(szValue);
+    if ((n < eVolumeMode_ShowNever) || (n >= eVolumeMode_LASTITEM)) {
+		    esyslog("targaVFD:  VolumeMode must be between %d and %d; using default %d",
+		           eVolumeMode_ShowNever, eVolumeMode_LASTITEM, DEFAULT_VOLUME_MODE);
+		    n = DEFAULT_VOLUME_MODE;
+    }
+    m_nVolumeMode = n;
+    return true;
+  }
+
   //Unknow parameter
   return false;
 }
@@ -167,6 +184,7 @@ void cVFDMenuSetup::Store(void)
   SetupStore("BigFont", theSetup.m_nBigFontHeight);
   SetupStore("SmallFont", theSetup.m_nSmallFontHeight);
   SetupStore("TwoLineMode",theSetup.m_bTwoLineMode);
+  SetupStore("VolumeMode", theSetup.m_nVolumeMode);
 }
 
 cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
@@ -210,6 +228,16 @@ cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
   Add(new cMenuEditStraItem (tr("Exit mode"),           
         &m_tmpSetup.m_nOnExit,
         memberof(szExitModes), szExitModes));
+
+
+  static const char * szVolumeMode[eVolumeMode_LASTITEM];
+  szVolumeMode[eVolumeMode_ShowNever] = tr("Never");
+  szVolumeMode[eVolumeMode_ShowTimed] = tr("Timed");
+  szVolumeMode[eVolumeMode_ShowEver]  = tr("Ever");
+
+  Add(new cMenuEditStraItem (tr("Show volume bargraph"),           
+        &m_tmpSetup.m_nVolumeMode,
+        memberof(szVolumeMode), szVolumeMode));
 }
 
 eOSState cVFDMenuSetup::ProcessKey(eKeys nKey)

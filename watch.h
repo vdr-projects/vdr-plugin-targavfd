@@ -82,6 +82,8 @@ private:
 
   int   m_nLastVolume;
   bool  m_bVolumeMute;
+  time_t  tsVolumeLast;
+
 
   cString*    osdTitle;
   cString*    osdItem;
@@ -100,7 +102,7 @@ protected:
   bool RenderScreen(bool bReDraw);
   eReplayState ReplayMode() const;
   bool ReplayPosition(int &current, int &total) const;
-  bool CurrentTime();
+  bool CurrentTime(time_t ts);
   bool ReplayTime();
   const char * FormatReplayTime(int current, int total) const;
 public:

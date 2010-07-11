@@ -53,7 +53,8 @@ cVFDWatch::cVFDWatch()
 
   m_nLastVolume = cDevice::CurrentVolume();
   m_bVolumeMute = false;
-  
+  tsVolumeLast = time(NULL);
+
   osdTitle = NULL;
   osdItem = NULL;
   osdMessage = NULL;
@@ -76,28 +77,28 @@ cVFDWatch::~cVFDWatch()
 {
   close();
   if(chName) { 
-      delete chName;
-      chName = NULL;
+    delete chName;
+    chName = NULL;
   }
   if(chPresentTitle) { 
-      delete chPresentTitle;
-      chPresentTitle = NULL;
+    delete chPresentTitle;
+    chPresentTitle = NULL;
   }
   if(chPresentShortTitle) { 
-      delete chPresentShortTitle;
-      chPresentShortTitle = NULL;
+    delete chPresentShortTitle;
+    chPresentShortTitle = NULL;
   }
   if(osdMessage) { 
-      delete osdMessage;
-      osdMessage = NULL;
+    delete osdMessage;
+    osdMessage = NULL;
   }
   if(osdTitle) { 
-      delete osdTitle;
-      osdTitle = NULL;
+    delete osdTitle;
+    osdTitle = NULL;
   }
   if(osdItem) { 
-      delete osdItem;
-      osdItem = NULL;
+    delete osdItem;
+    osdItem = NULL;
   }
   if(replayTitle) {
     delete replayTitle;
@@ -114,13 +115,13 @@ cVFDWatch::~cVFDWatch()
 }
 
 bool cVFDWatch::open() {
-    if(cVFD::open()) {
-        m_bShutdown = false;
-        m_bUpdateScreen = true;
-        Start();
-        return true;
-    }
-    return false;
+  if(cVFD::open()) {
+    m_bShutdown = false;
+    m_bUpdateScreen = true;
+    Start();
+    return true;
+  }
+  return false;
 }
 
 void cVFDWatch::close() {
@@ -205,10 +206,12 @@ void cVFDWatch::Action(void)
       cMutexLooker m(mutex);
       runTime.Set();
 
-	// every second the clock need updates.
-	if (theSetup.m_bTwoLineMode) {
+      time_t ts = time(NULL);
+
+  	  // every second the clock need updates.
+  	  if (theSetup.m_bTwoLineMode) {
         if((0 == (nCnt % 2))) {
-          bReDraw = CurrentTime();
+          bReDraw = CurrentTime(ts);
           if(m_eWatchMode != eLiveTV) {
             bReDraw |= ReplayTime();
           }
@@ -216,15 +219,7 @@ void cVFDWatch::Action(void)
       }
 
       bFlush = RenderScreen(bReDraw);
-      if(m_eWatchMode == eLiveTV) {
-          //if((chFollowingTime - chPresentTime) > 0) {
-          //  nBottomProgressBar = (time(NULL) - chPresentTime) * 32 / (chFollowingTime - chPresentTime);
-          //  if(nBottomProgressBar > 32) nBottomProgressBar = 32;
-          //  if(nBottomProgressBar < 0)  nBottomProgressBar = 0;
-          //} else {
-          //  nBottomProgressBar = 0;
-          //}
-      } else {
+      if(m_eWatchMode != eLiveTV) {
           switch(ReplayMode()) {
               case eReplayNone:
               case eReplayPaused:
@@ -252,12 +247,19 @@ void cVFDWatch::Action(void)
           }
       }
 
-      if(m_bVolumeMute) {
-        nIcons |= eIconMUTE;
-      } else {
-        nIcons |= eIconVOLUME;
-        const int nVolSteps = (MAXVOLUME/14);
-        nIcons |= (((1 << (m_nLastVolume / nVolSteps)) - 1) << 0x0B);
+      // update volume - bargraph or mute symbol
+		  if(theSetup.m_nVolumeMode != eVolumeMode_ShowNever) { 
+        if(m_bVolumeMute) {
+          nIcons |= eIconMUTE;
+        } else {
+		      if(theSetup.m_nVolumeMode == eVolumeMode_ShowEver 
+			      || ( theSetup.m_nVolumeMode == eVolumeMode_ShowTimed
+				      && (ts - tsVolumeLast) < 15 )) { // if timed - delay 15 seconds
+    		    nIcons |= eIconVOLUME;
+    		    const int nVolSteps = (MAXVOLUME/14);
+    		    nIcons |= (((1 << (m_nLastVolume / nVolSteps)) - 1) << 0x0B);
+    			}
+        }
       }
 
       if(theSetup.m_nBrightness != nBrightness) {
@@ -381,8 +383,7 @@ bool cVFDWatch::RenderScreen(bool bReDraw) {
     return false;
 }
 
-bool cVFDWatch::CurrentTime() {
-  time_t ts = time(NULL);
+bool cVFDWatch::CurrentTime(time_t ts) {
 
   if((ts / 60) != (tsCurrentLast / 60)) {
 
@@ -734,6 +735,7 @@ void cVFDWatch::Volume(int nVolume, bool bAbsolute)
     m_bVolumeMute = false;
   }
   m_nLastVolume = nAbsVolume;
+  tsVolumeLast = time(NULL);
 }
 
 

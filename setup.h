@@ -25,6 +25,13 @@ enum eOnExitMode {
   ,eOnExitMode_LASTITEM
 };
 
+enum eVolumeMode {
+   eVolumeMode_ShowNever   /**< Show the volume bar never */
+  ,eVolumeMode_ShowTimed   /**< Show the volume bar short time */
+  ,eVolumeMode_ShowEver    /**< Show the volume bar ever */
+  ,eVolumeMode_LASTITEM
+};
+
 struct cVFDSetup 
 {
   int          m_nOnExit;
@@ -39,6 +46,8 @@ struct cVFDSetup
   char         m_szFont[256];
 
   int          m_bTwoLineMode; /** enable two line mode */
+
+  int          m_nVolumeMode;
 
   cVFDSetup(void);
   cVFDSetup(const cVFDSetup& x);
