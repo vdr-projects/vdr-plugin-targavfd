@@ -136,7 +136,8 @@ void cVFDWatch::close() {
     cTimer* t = Timers.GetNextActiveTimer();    
 
     switch(theSetup.m_nOnExit) {
-      case eOnExitMode_NEXTTIMER: {
+      case eOnExitMode_NEXTTIMER:
+      case eOnExitMode_NEXTTIMER_BLANKSCR: {
         isyslog("targaVFD: closing, show only next timer.");
 
         this->clear();
@@ -156,7 +157,8 @@ void cVFDWatch::close() {
           this->DrawText(0,0,topic);
           this->icons(eIconRECORD);
         } else {
-          this->DrawText(0,0,tr("None active timer"));
+          if(theSetup.m_nOnExit == eOnExitMode_NEXTTIMER)
+            this->DrawText(0,0,tr("None active timer"));
           this->icons(0);
         }
         this->flush(true);

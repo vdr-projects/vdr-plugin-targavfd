@@ -22,6 +22,7 @@ enum eOnExitMode {
   ,eOnExitMode_SHOWCLOCK   /**< Show the big clock */
   ,eOnExitMode_BLANKSCREEN /**< Blank the device completely */
   ,eOnExitMode_NEXTTIMER   /**< Show next active timer */
+  ,eOnExitMode_NEXTTIMER_BLANKSCR   /**< Show next active timer, or blank if none timer defined */
   ,eOnExitMode_LASTITEM
 };
 

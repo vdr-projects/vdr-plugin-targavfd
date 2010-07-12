@@ -224,6 +224,7 @@ cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
   szExitModes[eOnExitMode_SHOWCLOCK]    = tr("Showing clock");
   szExitModes[eOnExitMode_BLANKSCREEN]  = tr("Turning display off");
   szExitModes[eOnExitMode_NEXTTIMER]    = tr("Show next timer");
+  szExitModes[eOnExitMode_NEXTTIMER_BLANKSCR] = tr("Show only present next timer");
 
   Add(new cMenuEditStraItem (tr("Exit mode"),           
         &m_tmpSetup.m_nOnExit,

@@ -76,16 +76,28 @@ Setup options
 This options are editable at run time. (Menu: Setup > Plugin > targavfd ... )
 
 * Brightness 
-  - Set brightness from display. (Default: 1)
+  - Set brightness from display. (Default: Half brightness)
 
 * Default font 
   - Used font, there should installed like other FreeType supported fonts 
+* Height of big font
+* Height of small font
+
+* Render mode
+  - Single line
+  - Dual lines
 
 * Exit mode
   - Do nothing - Just leave the "last" message there
   - Showing clock - Show the big clock
   - Turning display off - Blank the device completely
   - Show next timer - Show time and title of next timer
+  - Show only present next timer - If present, show time and title of next timer 
+
+* Show volume bargraph
+  - Never - Show the volume bar never
+  - Timed - Show the volume bar only a short time, if volume changed
+  - Ever  - Show the volume bar every time
 
 
 Plugin SVDRP commands
