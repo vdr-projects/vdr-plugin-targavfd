@@ -1,7 +1,7 @@
 VDR Plugin 'targavfd' Revision History
 -------------------------------------
 
-2010-07-12: Version 0.0.5
+2010-07-17: Version 0.0.5
 - Add exit mode 'Show only present next timer' (Request #356)
 - Add setup option to control volume bargraph
 - Allow partial data transfer
