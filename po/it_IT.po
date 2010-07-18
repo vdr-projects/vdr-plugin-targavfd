@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: vdr-targavfd-plugin 0.0.5\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2010-07-12 17:19+0200\n"
-"PO-Revision-Date: 2009-06-07 23:30+0100\n"
+"PO-Revision-Date: 2010-07-17 23:32+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -22,34 +22,34 @@ msgid "targavfd"
 msgstr "TargaVFD"
 
 msgid "Show nothing"
-msgstr "Non fare visualizzare"
+msgstr "Non mostrare niente"
 
 msgid "Half brightness"
-msgstr "Mezzora luminosità"
+msgstr "Luminosità a metà"
 
 msgid "Full brightness"
-msgstr "Completa luminosità"
+msgstr "Luminosità piena"
 
 msgid "Brightness"
 msgstr "Luminosità"
 
 msgid "Render mode"
-msgstr ""
+msgstr "Modalità visualizzazione"
 
 msgid "Single line"
-msgstr ""
+msgstr "Linea singola"
 
 msgid "Dual lines"
-msgstr ""
+msgstr "Linee doppie"
 
 msgid "Default font"
 msgstr "Carattere predefinito"
 
 msgid "Height of big font"
-msgstr ""
+msgstr "Altezza carattere grande"
 
 msgid "Height of small font"
-msgstr ""
+msgstr "Altezza carattere piccolo"
 
 msgid "Do nothing"
 msgstr "Non fare nulla"
@@ -61,32 +61,32 @@ msgid "Turning display off"
 msgstr "Spegni retroilluminazione"
 
 msgid "Show next timer"
-msgstr "Mostra prossimo timer"
+msgstr "Mostra timer successivo"
 
-#, fuzzy
 msgid "Show only present next timer"
-msgstr "Mostra prossimo timer"
+msgstr "Mostra solo timer successivo"
 
 msgid "Exit mode"
 msgstr "Modalità d'uscita"
 
 msgid "Never"
-msgstr ""
+msgstr "Mai"
 
 msgid "Timed"
-msgstr ""
+msgstr "Temporizzato"
 
 msgid "Ever"
-msgstr ""
+msgstr "Sempre"
 
 msgid "Show volume bargraph"
-msgstr ""
+msgstr "Mostra grafico a barre volume"
 
 msgid "Control a targa vfd"
-msgstr "Controlla un VFD targa"
+msgstr "Controlla una targa VFD"
 
 msgid "None active timer"
 msgstr "Nessun timer attivo"
 
 msgid "Unknown title"
 msgstr "Titolo sconosciuto"
+

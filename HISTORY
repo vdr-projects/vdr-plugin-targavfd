@@ -7,7 +7,7 @@ VDR Plugin 'targavfd' Revision History
 - Allow partial data transfer
 - Select brightness by in plain language
 - Update running clock frequently
-- Down show icons, if showing clock on exit
+- Don't show icons, if showing clock on exit
 
 2010-04-28: Version 0.0.4
 - Allow setup font size
