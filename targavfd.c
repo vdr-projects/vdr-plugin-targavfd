@@ -20,7 +20,7 @@
 #include "status.h"
 #include "setup.h"
 
-static const char *VERSION        = "0.0.5";
+static const char *VERSION        = "0.0.6";
 
 class cPluginTargaVFD : public cPlugin {
 private:

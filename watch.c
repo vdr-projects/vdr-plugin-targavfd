@@ -140,6 +140,7 @@ void cVFDWatch::close() {
       case eOnExitMode_NEXTTIMER_BLANKSCR: {
         isyslog("targaVFD: closing, show only next timer.");
 
+        int nTop = (theSetup.m_cHeight - pFont->Height())/2;
         this->clear();
         if(t) {
           struct tm l;
@@ -149,16 +150,27 @@ void cVFDWatch::close() {
           localtime_r(&tt, &l);
           if((tt - tn) > 86400) {
             // next timer more then 24h 
-            topic = cString::sprintf("%d. %02d:%02d %s", l.tm_mday, l.tm_hour, l.tm_min, t->File());
+            topic = cString::sprintf("%d. %02d:%02d", l.tm_mday, l.tm_hour, l.tm_min);
           } else {
             // next timer (today)
-            topic = cString::sprintf("%02d:%02d %s", l.tm_hour, l.tm_min, t->File());
+            topic = cString::sprintf("%02d:%02d", l.tm_hour, l.tm_min);
           }
-          this->DrawText(0,0,topic);
+
+          int w = pFont->Width(topic);
+          if(theSetup.m_bTwoLineMode) {
+            this->DrawText(0,0,topic);
+            if((w + 3) < theSetup.m_cWidth)
+                this->DrawText(w + 3,0,t->Channel()->Name());
+            this->DrawText(0,pFont->Height(), t->File());
+          } else {
+            this->DrawText(0,nTop<0?0:nTop, topic);
+            if((w + 3) < theSetup.m_cWidth)
+                this->DrawText(w + 3,nTop<0?0:nTop, t->File());
+          }
           this->icons(eIconRECORD);
         } else {
-          if(theSetup.m_nOnExit == eOnExitMode_NEXTTIMER)
-            this->DrawText(0,0,tr("None active timer"));
+          if(theSetup.m_nOnExit == eOnExitMode_NEXTTIMER) 
+            this->DrawText(0,nTop<0?0:nTop,tr("None active timer"));
           this->icons(0);
         }
         this->flush(true);
