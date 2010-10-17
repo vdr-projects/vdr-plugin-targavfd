@@ -33,6 +33,13 @@ enum eVolumeMode {
   ,eVolumeMode_LASTITEM
 };
 
+enum eRenderMode {
+   eRenderMode_SingleLine   /**< Render screen at single line */
+  ,eRenderMode_DualLine     /**< Render screen at dual line */
+  ,eRenderMode_SingleTopic  /**< Render screen at single line, only names */
+  ,eRenderMode_LASTITEM
+};
+
 struct cVFDSetup 
 {
   int          m_nOnExit;
@@ -46,7 +53,7 @@ struct cVFDSetup
 
   char         m_szFont[256];
 
-  int          m_bTwoLineMode; /** enable two line mode */
+  int          m_nRenderMode; /** enable two line mode */
 
   int          m_nVolumeMode;
 

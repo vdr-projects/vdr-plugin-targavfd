@@ -161,7 +161,7 @@ void cVFDWatch::close() {
           }
 
           int w = pFont->Width(topic);
-          if(theSetup.m_bTwoLineMode) {
+          if(theSetup.m_nRenderMode == eRenderMode_DualLine) {
             this->DrawText(0,0,topic);
             if((w + 3) < theSetup.m_cWidth)
                 this->DrawText(w + 3,0,t->Channel()->Name());
@@ -227,7 +227,7 @@ void cVFDWatch::Action(void)
       time_t ts = time(NULL);
 
   	  // every second the clock need updates.
-  	  if (theSetup.m_bTwoLineMode) {
+  	  if (theSetup.m_nRenderMode == eRenderMode_DualLine) {
         if((0 == (nCnt % 2))) {
           bReDraw = CurrentTime(ts);
           if(m_eWatchMode != eLiveTV) {
@@ -325,7 +325,7 @@ bool cVFDWatch::RenderScreen(bool bReDraw) {
         if(Program()) {
           bForce = true;
         }
-        if(chPresentTitle) {
+        if(chPresentTitle && theSetup.m_nRenderMode != eRenderMode_SingleTopic) {
           scRender = chPresentTitle;
           bAllowCurrentTime = true;
         } else {
@@ -352,7 +352,7 @@ bool cVFDWatch::RenderScreen(bool bReDraw) {
       if(scRender) {
     
         int iRet = -1;
-        if(theSetup.m_bTwoLineMode) {
+        if(theSetup.m_nRenderMode == eRenderMode_DualLine) {
           iRet = this->DrawText(0 - m_nScrollOffset,pFont->Height(), *scRender);
         } else {
           int nTop = (theSetup.m_cHeight - pFont->Height())/2;
@@ -384,7 +384,7 @@ bool cVFDWatch::RenderScreen(bool bReDraw) {
         }
       }
 
-      if(scHeader && theSetup.m_bTwoLineMode) {
+      if(scHeader && theSetup.m_nRenderMode == eRenderMode_DualLine) {
         if(bAllowCurrentTime && currentTime) {
           int t = pFont->Width(*currentTime);
           int w = pFont->Width(*scHeader);
@@ -874,7 +874,7 @@ void cVFDWatch::OsdStatusMessage(const char *sz)
     }
 }
 
-bool cVFDWatch::SetFont(const char *szFont, int bTwoLineMode, int nBigFontHeight, int nSmallFontHeight) {
+bool cVFDWatch::SetFont(const char *szFont, bool bTwoLineMode, int nBigFontHeight, int nSmallFontHeight) {
     cMutexLooker m(mutex);
     if(cVFD::SetFont(szFont, bTwoLineMode, nBigFontHeight, nSmallFontHeight)) {
       m_bUpdateScreen = true;

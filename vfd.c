@@ -261,7 +261,7 @@ cVFD::~cVFD() {
 bool cVFD::open()
 {
   if(!SetFont(theSetup.m_szFont, 
-              theSetup.m_bTwoLineMode, 
+              theSetup.m_nRenderMode == eRenderMode_DualLine, 
               theSetup.m_nBigFontHeight, 
               theSetup.m_nSmallFontHeight)) {
 		return false;
@@ -476,7 +476,7 @@ void cVFD::Brightness(int nBrightness)
   this->QueueData((byte) (nBrightness));
 }
 
-bool cVFD::SetFont(const char *szFont, int bTwoLineMode, int nBigFontHeight, int nSmallFontHeight) {
+bool cVFD::SetFont(const char *szFont, bool bTwoLineMode, int nBigFontHeight, int nSmallFontHeight) {
 
   cVFDFont* tmpFont = NULL;
 
