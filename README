@@ -86,6 +86,7 @@ This options are editable at run time. (Menu: Setup > Plugin > targavfd ... )
 * Render mode
   - Single line
   - Dual lines
+  - Single line (Channel names only)
 
 * Exit mode
   - Do nothing - Just leave the "last" message there

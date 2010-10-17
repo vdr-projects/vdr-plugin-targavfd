@@ -1,10 +1,9 @@
 VDR Plugin 'targavfd' Revision History
 -------------------------------------
 
-2010-09-11
+2010-
+- Add render mode "show channel names only" (Feature #426)
 - Show next timer on lines (Feature #427)
-
-2010-07-18
 - Update italian translation (Support #357)
 
 2010-07-17: Version 0.0.5
