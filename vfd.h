@@ -55,6 +55,7 @@ class cVFDQueue : public std::queue<byte> {
 public:
   cVFDQueue();
   virtual ~cVFDQueue();
+protected:
   virtual bool open();
   virtual void close();
   virtual bool isopen() const { return hid != 0; }
@@ -84,7 +85,7 @@ public:
   virtual ~cVFD();
 
   virtual bool open();
-  virtual void close ();
+  virtual void close();
 
 
   void clear ();

@@ -110,7 +110,7 @@ public:
   virtual ~cVFDWatch();
 
   virtual bool open();
-  virtual void close ();
+  virtual void shutdown(int nExitMode);
 
   void Replaying(const cControl *pControl, const char *szName, const char *szFileName, bool bOn);
   void Recording(const cDevice *pDevice, const char *szName, const char *szFileName, bool bOn);

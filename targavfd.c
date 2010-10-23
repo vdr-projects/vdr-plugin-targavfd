@@ -109,7 +109,7 @@ bool cPluginTargaVFD::resume() {
 
 bool cPluginTargaVFD::suspend() {
   if(!m_bSuspend) {
-    m_dev.close();
+    m_dev.shutdown(eOnExitMode_BLANKSCREEN);
     m_bSuspend = true;
     return true;
   }
@@ -134,7 +134,7 @@ void cPluginTargaVFD::Stop(void)
     delete statusMonitor;
     statusMonitor = NULL;
   }
-  m_dev.close();
+  m_dev.shutdown(theSetup.m_nOnExit);
 }
 
 void cPluginTargaVFD::Housekeeping(void)

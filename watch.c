@@ -75,7 +75,6 @@ cVFDWatch::cVFDWatch()
 
 cVFDWatch::~cVFDWatch()
 {
-  close();
   if(chName) { 
     delete chName;
     chName = NULL;
@@ -128,7 +127,7 @@ bool cVFDWatch::open() {
   return false;
 }
 
-void cVFDWatch::close() {
+void cVFDWatch::shutdown(int nExitMode) {
 
   if(Running()) {
     m_bShutdown = true;
@@ -139,7 +138,7 @@ void cVFDWatch::close() {
   if(this->isopen()) {
     cTimer* t = Timers.GetNextActiveTimer();    
 
-    switch(theSetup.m_nOnExit) {
+    switch(nExitMode) {
       case eOnExitMode_NEXTTIMER:
       case eOnExitMode_NEXTTIMER_BLANKSCR: {
         isyslog("targaVFD: closing, show only next timer.");
@@ -173,7 +172,7 @@ void cVFDWatch::close() {
           }
           this->icons(eIconRECORD);
         } else {
-          if(theSetup.m_nOnExit == eOnExitMode_NEXTTIMER) 
+          if(nExitMode == eOnExitMode_NEXTTIMER) 
             this->DrawText(0,nTop<0?0:nTop,tr("None active timer"));
           this->icons(0);
         }
