@@ -2,6 +2,7 @@ VDR Plugin 'targavfd' Revision History
 -------------------------------------
 
 2010-
+- Allow turn display off at night (Feature #175)
 - Add render mode "show channel names only" (Feature #426)
 - Show next timer on lines (Feature #427)
 - Update italian translation (Support #357)

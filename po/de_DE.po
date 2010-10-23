@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-targavfd-plugin 0.0.5\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-10-09 18:56+0200\n"
+"POT-Creation-Date: 2010-10-23 18:00+0200\n"
 "PO-Revision-Date: 2010-07-02 21:25+0200\n"
 "Last-Translator: Andreas Brachold <vdr07 AT deltab de>\n"
 "Language-Team: Andreas Brachold <vdr07 AT deltab de>\n"
@@ -81,6 +81,21 @@ msgstr "Immer"
 msgid "Show volume bargraph"
 msgstr "Lautstärkebargraph anzeigen"
 
+msgid "Resume on activities"
+msgstr "Reaktivieren bei Aktivität"
+
+msgid "Only per time"
+msgstr "Gemäß der Zeit"
+
+msgid "Suspend display at night"
+msgstr "Nächtliches Aussetzen der Anzeige"
+
+msgid "Beginning of suspend"
+msgstr "Anfangszeit"
+
+msgid "End time of suspend"
+msgstr "Endzeit"
+
 msgid "Control a targa vfd"
 msgstr "Steuert ein Targa VFD"
 
@@ -89,4 +104,3 @@ msgstr "Kein aktiver Timer"
 
 msgid "Unknown title"
 msgstr "Unbekannter Titel"
-

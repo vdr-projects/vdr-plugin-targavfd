@@ -20,6 +20,7 @@
 #include "ffont.h"
 
 #include <vdr/tools.h>
+#include <vdr/shutdown.h>
 
 struct cMutexLooker {
   cMutex& mutex;
@@ -65,7 +66,6 @@ cVFDWatch::cVFDWatch()
   replayTime = NULL;
 
   currentTime = NULL;
-
   m_eWatchMode = eLiveTV;
 
   m_nScrollOffset = -1;
@@ -210,6 +210,8 @@ void cVFDWatch::Action(void)
   unsigned int nCnt = 0;
 
   cTimeMs runTime;
+  struct tm tm_r;
+  bool bLastSuspend = false;
 
   for (;!m_bShutdown;++nCnt) {
     
@@ -218,6 +220,7 @@ void cVFDWatch::Action(void)
     unsigned int nIcons = 0;
     bool bFlush = false;
     bool bReDraw = false;
+    bool bSuspend = false;
     if(m_bShutdown)
       break;
     else {
@@ -225,64 +228,89 @@ void cVFDWatch::Action(void)
       runTime.Set();
 
       time_t ts = time(NULL);
+      if(theSetup.m_nSuspendMode != eSuspendMode_Never 
+          && theSetup.m_nSuspendTimeOff != theSetup.m_nSuspendTimeOn) {
+        struct tm *now = localtime_r(&ts, &tm_r);
+        int clock = now->tm_hour * 100 + now->tm_min;
+        if(theSetup.m_nSuspendTimeOff > theSetup.m_nSuspendTimeOn) { //like 8-20
+          bSuspend = (clock >= theSetup.m_nSuspendTimeOn) 
+                  && (clock <= theSetup.m_nSuspendTimeOff);
+        } else { //like 0-8 and 20..24
+          bSuspend = (clock >= theSetup.m_nSuspendTimeOn) 
+                  || (clock <= theSetup.m_nSuspendTimeOff);
+        }
+        if(theSetup.m_nSuspendMode == eSuspendMode_Timed 
+              && !ShutdownHandler.IsUserInactive()) {
+          bSuspend = false;
+        }
+      }
+      if(bSuspend != bLastSuspend) {
+        bReDraw = true;
+      }
 
-  	  // every second the clock need updates.
-  	  if (theSetup.m_nRenderMode == eRenderMode_DualLine) {
-        if((0 == (nCnt % 2))) {
-          bReDraw = CurrentTime(ts);
-          if(m_eWatchMode != eLiveTV) {
-            bReDraw |= ReplayTime();
+      if(!bSuspend) { 
+    	  // every second the clock need updates.
+    	  if (theSetup.m_nRenderMode == eRenderMode_DualLine) {
+          if((0 == (nCnt % 2))) {
+            bReDraw = CurrentTime(ts);
+            if(m_eWatchMode != eLiveTV) {
+              bReDraw |= ReplayTime();
+            }
+          }
+        }
+
+        bFlush = RenderScreen(bReDraw);
+        if(m_eWatchMode != eLiveTV) {
+            switch(ReplayMode()) {
+                case eReplayNone:
+                case eReplayPaused:
+                  nIcons |= eIconPAUSE;
+                  break;
+                default:
+                case eReplayPlay:
+                  nIcons |= eIconPLAY;
+                  break;
+                case eReplayBackward1:
+                case eReplayBackward2:
+                case eReplayBackward3:
+                  break;
+                case eReplayForward1:
+                case eReplayForward2:
+                case eReplayForward3:
+                  break;
+            }
+        }
+
+        for(n=0;n<memberof(m_nCardIsRecording);++n) {
+            if(0 != m_nCardIsRecording[n]) {
+              nIcons |= eIconRECORD;
+              break;
+            }
+        }
+
+        // update volume - bargraph or mute symbol
+		    if(theSetup.m_nVolumeMode != eVolumeMode_ShowNever) { 
+          if(m_bVolumeMute) {
+            nIcons |= eIconMUTE;
+          } else {
+		        if(theSetup.m_nVolumeMode == eVolumeMode_ShowEver 
+			        || ( theSetup.m_nVolumeMode == eVolumeMode_ShowTimed
+				        && (ts - tsVolumeLast) < 15 )) { // if timed - delay 15 seconds
+      		    nIcons |= eIconVOLUME;
+      		    const int nVolSteps = (MAXVOLUME/14);
+      		    nIcons |= (((1 << (m_nLastVolume / nVolSteps)) - 1) << 0x0B);
+      			}
           }
         }
       }
 
-      bFlush = RenderScreen(bReDraw);
-      if(m_eWatchMode != eLiveTV) {
-          switch(ReplayMode()) {
-              case eReplayNone:
-              case eReplayPaused:
-                nIcons |= eIconPAUSE;
-                break;
-              default:
-              case eReplayPlay:
-                nIcons |= eIconPLAY;
-                break;
-              case eReplayBackward1:
-              case eReplayBackward2:
-              case eReplayBackward3:
-                break;
-              case eReplayForward1:
-              case eReplayForward2:
-              case eReplayForward3:
-                break;
-          }
-      }
-
-      for(n=0;n<memberof(m_nCardIsRecording);++n) {
-          if(0 != m_nCardIsRecording[n]) {
-            nIcons |= eIconRECORD;
-            break;
-          }
-      }
-
-      // update volume - bargraph or mute symbol
-		  if(theSetup.m_nVolumeMode != eVolumeMode_ShowNever) { 
-        if(m_bVolumeMute) {
-          nIcons |= eIconMUTE;
-        } else {
-		      if(theSetup.m_nVolumeMode == eVolumeMode_ShowEver 
-			      || ( theSetup.m_nVolumeMode == eVolumeMode_ShowTimed
-				      && (ts - tsVolumeLast) < 15 )) { // if timed - delay 15 seconds
-    		    nIcons |= eIconVOLUME;
-    		    const int nVolSteps = (MAXVOLUME/14);
-    		    nIcons |= (((1 << (m_nLastVolume / nVolSteps)) - 1) << 0x0B);
-    			}
-        }
-      }
-
-      if(theSetup.m_nBrightness != nBrightness) {
+      // Set Brightness if setup value changed or display set to suspend
+      if(theSetup.m_nBrightness != nBrightness || 
+         bSuspend != bLastSuspend) {
         nBrightness = theSetup.m_nBrightness;
-        Brightness(nBrightness);
+        Brightness(bSuspend ? 0 : nBrightness);
+        bLastSuspend = bSuspend;
+        bFlush = true;
       }
 
       //Force icon state (defined by svdrp)
@@ -300,7 +328,7 @@ void cVFDWatch::Action(void)
         flush(false);
       }
     }
-    int nDelay = 100 - runTime.Elapsed();
+    int nDelay = (bSuspend ? 1000 : 100) - runTime.Elapsed();
     if(nDelay <= 10) {
       nDelay = 10;
     }

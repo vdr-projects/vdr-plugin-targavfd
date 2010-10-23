@@ -40,6 +40,13 @@ enum eRenderMode {
   ,eRenderMode_LASTITEM
 };
 
+enum eSuspendMode {
+   eSuspendMode_Never   /**< Suspend display never */
+  ,eSuspendMode_Timed   /**< Suspend display, resume short time */
+  ,eSuspendMode_Ever    /**< Suspend display ever */
+  ,eSuspendMode_LASTITEM
+};
+
 struct cVFDSetup 
 {
   int          m_nOnExit;
@@ -56,6 +63,10 @@ struct cVFDSetup
   int          m_nRenderMode; /** enable two line mode */
 
   int          m_nVolumeMode;
+
+  int          m_nSuspendMode;
+  int          m_nSuspendTimeOn;
+  int          m_nSuspendTimeOff;
 
   cVFDSetup(void);
   cVFDSetup(const cVFDSetup& x);

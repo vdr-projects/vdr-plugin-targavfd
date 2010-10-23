@@ -32,6 +32,7 @@
 #define DEFAULT_BIG_FONT_HEIGHT   14
 #define DEFAULT_SMALL_FONT_HEIGHT 7
 #define DEFAULT_VOLUME_MODE 	eVolumeMode_ShowEver    /**< Show the volume bar ever */
+#define DEFAULT_SUSPEND_MODE 	eSuspendMode_Never      /**< Suspend display never */
 
 /// The one and only Stored setup data
 cVFDSetup theSetup;
@@ -47,6 +48,9 @@ cVFDSetup::cVFDSetup(void)
   m_nBigFontHeight = DEFAULT_BIG_FONT_HEIGHT;
   m_nSmallFontHeight = DEFAULT_SMALL_FONT_HEIGHT;
   m_nVolumeMode = DEFAULT_VOLUME_MODE;
+  m_nSuspendMode = DEFAULT_SUSPEND_MODE;
+  m_nSuspendTimeOn = 2200;
+  m_nSuspendTimeOff = 800;
 
   strncpy(m_szFont,DEFAULT_FONT,sizeof(m_szFont));
 }
@@ -68,6 +72,9 @@ cVFDSetup& cVFDSetup::operator = (const cVFDSetup& x)
   m_nSmallFontHeight = x.m_nSmallFontHeight;
 
   m_nVolumeMode = x.m_nVolumeMode;
+  m_nSuspendMode = x.m_nSuspendMode;
+  m_nSuspendTimeOn = x.m_nSuspendTimeOn;
+  m_nSuspendTimeOff = x.m_nSuspendTimeOff;
 
   strncpy(m_szFont,x.m_szFont,sizeof(m_szFont));
 
@@ -162,6 +169,40 @@ bool cVFDSetup::SetupParse(const char *szName, const char *szValue)
     return true;
   }
 
+  // SuspendMode
+  if(!strcasecmp(szName, "SuspendMode")) {
+    int n = atoi(szValue);
+    if ((n < eSuspendMode_Never) || (n >= eSuspendMode_LASTITEM)) {
+		    esyslog("targaVFD:  SuspendMode must be between %d and %d, using default %d",
+		           eSuspendMode_Never, eSuspendMode_LASTITEM, DEFAULT_SUSPEND_MODE);
+		    n = DEFAULT_SUSPEND_MODE;
+    }
+    m_nSuspendMode = n;
+    return true;
+  }
+  // SuspendTimeOn
+  if(!strcasecmp(szName, "SuspendTimeOn")) {
+    int n = atoi(szValue);
+    if ((n < 0) || (n >= 2400)) {
+		    esyslog("targaVFD:  SuspendTimeOn must be between %d and %d, using default %d",
+		           0, 2359, 0);
+		    n = 0;
+    }
+    m_nSuspendTimeOn = n;
+    return true;
+  }
+  // SuspendTimeOff
+  if(!strcasecmp(szName, "SuspendTimeOff")) {
+    int n = atoi(szValue);
+    if ((n < 0) || (n >= 2400)) {
+		    esyslog("targaVFD:  SuspendTimeOff must be between %d and %d, using default %d",
+		           0, 2359, 0);
+		    n = 0;
+    }
+    m_nSuspendTimeOff = n;
+    return true;
+  }
+
   //Unknow parameter
   return false;
 }
@@ -179,6 +220,9 @@ void cVFDMenuSetup::Store(void)
   SetupStore("SmallFont", theSetup.m_nSmallFontHeight);
   SetupStore("TwoLineMode",theSetup.m_nRenderMode);
   SetupStore("VolumeMode", theSetup.m_nVolumeMode);
+  SetupStore("SuspendMode", theSetup.m_nSuspendTimeOn);
+  SetupStore("SuspendTimeOn", theSetup.m_nSuspendTimeOn);
+  SetupStore("SuspendTimeOff", theSetup.m_nSuspendTimeOff);
 }
 
 cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
@@ -238,6 +282,19 @@ cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
   Add(new cMenuEditStraItem (tr("Show volume bargraph"),           
         &m_tmpSetup.m_nVolumeMode,
         memberof(szVolumeMode), szVolumeMode));
+
+  static const char * szSuspendMode[eSuspendMode_LASTITEM];
+  szSuspendMode[eSuspendMode_Never] = tr("Never");
+  szSuspendMode[eSuspendMode_Timed] = tr("Resume on activities");
+  szSuspendMode[eSuspendMode_Ever]  = tr("Only per time");
+
+  Add(new cMenuEditStraItem (tr("Suspend display at night"),           
+        &m_tmpSetup.m_nSuspendMode,
+        memberof(szSuspendMode), szSuspendMode));
+  Add(new cMenuEditTimeItem (tr("Beginning of suspend"),           
+        &m_tmpSetup.m_nSuspendTimeOn));
+  Add(new cMenuEditTimeItem (tr("End time of suspend"),           
+        &m_tmpSetup.m_nSuspendTimeOff));
 }
 
 eOSState cVFDMenuSetup::ProcessKey(eKeys nKey)
