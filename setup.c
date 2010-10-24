@@ -220,7 +220,7 @@ void cVFDMenuSetup::Store(void)
   SetupStore("SmallFont", theSetup.m_nSmallFontHeight);
   SetupStore("TwoLineMode",theSetup.m_nRenderMode);
   SetupStore("VolumeMode", theSetup.m_nVolumeMode);
-  SetupStore("SuspendMode", theSetup.m_nSuspendTimeOn);
+  SetupStore("SuspendMode", theSetup.m_nSuspendMode);
   SetupStore("SuspendTimeOn", theSetup.m_nSuspendTimeOn);
   SetupStore("SuspendTimeOff", theSetup.m_nSuspendTimeOff);
 }
