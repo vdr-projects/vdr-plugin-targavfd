@@ -90,6 +90,9 @@ public:
 
   void clear ();
   int DrawText(int x, int y, const char* string);
+  int Height() const;
+  int Width() const;
+  bool Rectangle(int x1, int y1, int x2, int y2, bool filled);
   bool flush (bool refreshAll = true);
 
   void icons(unsigned int state);

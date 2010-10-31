@@ -360,6 +360,9 @@ bool cVFDWatch::RenderScreen(bool bReDraw) {
           scRender = chName;
         }
     } else {
+        if(RenderSpectrumAnalyzer())
+          return true;
+
         if(Replay()) {
           bForce = true;
         }

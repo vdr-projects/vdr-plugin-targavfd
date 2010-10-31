@@ -21,8 +21,17 @@ class cVFDBitmap  {
   uchar *bitmap;
 protected:
   cVFDBitmap();
+
+  inline void sort(int& x,int& y) {
+    if(x<y) return;
+    int t = x;
+    x = y;
+    y = t;
+  };
+  bool HLine(int x1, int y, int x2);
+  bool VLine(int x, int y1, int y2);
 public:
-  cVFDBitmap( int w, int h );
+  cVFDBitmap(int w,int h);
   
   virtual ~cVFDBitmap();
   cVFDBitmap& operator = (const cVFDBitmap& x);
@@ -31,7 +40,9 @@ public:
   void clear();
   int Height() const { return height; }
   int Width() const { return width; }
+
   bool SetPixel(int x, int y);
+  bool Rectangle(int x1, int y1, int x2, int y2, bool filled);
 
   uchar * getBitmap() const { return bitmap; };
 };

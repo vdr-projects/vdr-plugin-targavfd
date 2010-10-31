@@ -1,7 +1,8 @@
 VDR Plugin 'targavfd' Revision History
 -------------------------------------
 
-2010-
+2010-10-31: Version 0.0.6
+- Support spectrum analyzer visualization (need span-plugin)
 - Allow turn display off at night (Feature #175)
 - Add render mode "show channel names only" (Feature #426)
 - Show next timer on lines (Feature #427)

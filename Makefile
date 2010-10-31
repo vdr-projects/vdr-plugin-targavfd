@@ -63,7 +63,7 @@ DEFINES += -DHAVE_STDBOOL_H
 
 ### The object files (add further files here):
 
-OBJS = $(PLUGIN).o bitmap.o vfd.o ffont.o setup.o status.o watch.o
+OBJS = $(PLUGIN).o bitmap.o vfd.o ffont.o setup.o status.o watch.o span.o
 
 ### The main target:
 

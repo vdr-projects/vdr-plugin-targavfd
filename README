@@ -132,4 +132,10 @@ ICON :  250 icon state 'auto'
         252 icon state 'off'
 *       501 unknown command
 
+Spectrum analyzer visualization
+-------------------------------
+This plugin can show a spectrum analyzer visualization on audio playback.
+As middleware you need the 'Sp'ectrum 'An'alyzer Plugin.
+
+See also http://lcr.vdr-developer.org/htmls/span-plugin.html
 

@@ -15,49 +15,13 @@
 #include <getopt.h>
 #include <string.h>
 
+#include "targavfd.h"
 #include "vfd.h"
 #include "watch.h"
 #include "status.h"
 #include "setup.h"
 
 static const char *VERSION        = "0.0.6";
-
-class cPluginTargaVFD : public cPlugin {
-private:
-  cVFDStatusMonitor *statusMonitor;
-  cVFDWatch         m_dev;
-  bool               m_bSuspend;
-  char*              m_szIconHelpPage;
-protected:
-  bool resume();
-  bool suspend();
-
-  const char* SVDRPCommandOn(const char *Option, int &ReplyCode);
-  const char* SVDRPCommandOff(const char *Option, int &ReplyCode);
-  const char* SVDRPCommandIcon(const char *Option, int &ReplyCode);
-
-public:
-  cPluginTargaVFD(void);
-  virtual ~cPluginTargaVFD();
-  virtual const char *Version(void) { return VERSION; }
-  virtual const char *Description(void) { return tr("Control a targa vfd"); }
-  virtual const char *CommandLineHelp(void);
-  virtual bool ProcessArgs(int argc, char *argv[]);
-  virtual bool Initialize(void);
-  virtual bool Start(void);
-  virtual void Stop(void);
-  virtual void Housekeeping(void);
-  virtual void MainThreadHook(void);
-  virtual cString Active(void);
-  virtual time_t WakeupTime(void);
-  virtual const char *MainMenuEntry(void) { return NULL; }
-  virtual cOsdObject *MainMenuAction(void);
-  virtual cMenuSetupPage *SetupMenu(void);
-  virtual bool SetupParse(const char *Name, const char *Value);
-  virtual bool Service(const char *Id, void *Data = NULL);
-  virtual const char **SVDRPHelpPages(void);
-  virtual cString SVDRPCommand(const char *Command, const char *Option, int &ReplyCode);
-  };
 
 cPluginTargaVFD::cPluginTargaVFD(void)
 {
@@ -78,6 +42,14 @@ cPluginTargaVFD::~cPluginTargaVFD()
     free(m_szIconHelpPage);
     m_szIconHelpPage = NULL;
   }
+}
+
+const char* cPluginTargaVFD::Version(void) { 
+  return VERSION; 
+}
+
+const char* cPluginTargaVFD::Description(void) { 
+  return tr("Control a targa vfd"); 
 }
 
 const char *cPluginTargaVFD::CommandLineHelp(void)
@@ -173,12 +145,6 @@ cMenuSetupPage *cPluginTargaVFD::SetupMenu(void)
 bool cPluginTargaVFD::SetupParse(const char *szName, const char *szValue)
 {
   return theSetup.SetupParse(szName,szValue);
-}
-
-bool cPluginTargaVFD::Service(const char *Id, void *Data)
-{
-  // Handle custom service requests from other plugins
-  return false;
 }
 
 const char* cPluginTargaVFD::SVDRPCommandOn(const char *Option, int &ReplyCode)

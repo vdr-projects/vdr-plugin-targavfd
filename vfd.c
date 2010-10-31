@@ -439,6 +439,42 @@ int cVFD::DrawText(int x, int y, const char* string)
   return -1;
 }
 
+/**
+ * Height of framebuffer from current device.
+ */
+int cVFD::Height() const
+{
+  if(framebuf)
+    return framebuf->Height();
+  return 0;
+}
+
+/**
+ * Width of framebuffer from current device.
+ */
+int cVFD::Width() const
+{
+  if(framebuf)
+    return framebuf->Width();
+  return 0;
+}
+
+/**
+ * Draw a rectangle on framebuffer on device. 
+ *
+ * \param x1       First horizontal corner (column).
+ * \param y1       First vertical corner (row).
+ * \param x2       Second horizontal corner (column).
+ * \param y2       Second vertical corner (row).
+ * \param filled   drawing of rectangle should be filled.
+ */
+bool cVFD::Rectangle(int x1, int y1, int x2, int y2, bool filled)
+{
+  if(framebuf)
+    return framebuf->Rectangle(x1, y1, x2, y2, filled);
+  return false;
+}
+
 
 /**
  * Sets the "icons state" for the device. We use this to control the icons

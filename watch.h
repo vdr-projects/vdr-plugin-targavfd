@@ -100,6 +100,7 @@ protected:
   bool Program();
   bool Replay();
   bool RenderScreen(bool bReDraw);
+  bool RenderSpectrumAnalyzer();
   eReplayState ReplayMode() const;
   bool ReplayPosition(int &current, int &total) const;
   bool CurrentTime(time_t ts);
