@@ -1,0 +1,32 @@
+how to anonymously get the current source
+=========================================
+
+git clone git://projects.vdr-developer.org/vdr-plugin-targavfd.git targavfd
+
+how to make a new release
+=========================
+
+adapt version in targavfd.c and HISTORY
+
+set date in HISTORY
+
+git commit
+git status # must be clean
+git tag -a -m'new release' '0.0.5'
+git push --tags
+
+cd
+cd tmp
+rm -rf targavfd-0.0.5
+git clone git://projects.vdr-developer.org/vdr-plugin-targavfd.git targavfd-0.0.5
+cd targavfd-0.0.5
+git checkout 0.0.5
+rm -rf .git*
+cd ..
+tar cfz vdr-targavfd-0.0.5.tgz targavfd-0.0.5
+
+in the project configuration, add new version 0.0.5
+upload vdr-targavfd-0.0.5.tgz
+
+announce new version at vdr@linuxtv.org
+

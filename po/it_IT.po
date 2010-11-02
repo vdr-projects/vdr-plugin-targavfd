@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: vdr-targavfd-plugin 0.0.5\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2010-10-23 18:00+0200\n"
-"PO-Revision-Date: 2010-07-17 23:32+0100\n"
+"PO-Revision-Date: 2010-11-01 22:55+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -40,7 +40,7 @@ msgid "Dual lines"
 msgstr "Linee doppie"
 
 msgid "Only topic"
-msgstr "Titolo solo"
+msgstr "Solo titolo"
 
 msgid "Render mode"
 msgstr "Modalità visualizzazione"
@@ -82,23 +82,22 @@ msgid "Ever"
 msgstr "Sempre"
 
 msgid "Show volume bargraph"
-msgstr "Mostra grafico a barre volume"
+msgstr "Mostra grafico a barre del volume"
 
 msgid "Resume on activities"
-msgstr ""
+msgstr "Riprendi attività"
 
-#, fuzzy
 msgid "Only per time"
-msgstr "Titolo solo"
+msgstr "Solo per l'ora"
 
 msgid "Suspend display at night"
-msgstr ""
+msgstr "Sospendi schermo la notte"
 
 msgid "Beginning of suspend"
-msgstr ""
+msgstr "Inizio sospensione"
 
 msgid "End time of suspend"
-msgstr ""
+msgstr "Fine sospensione"
 
 msgid "Control a targa vfd"
 msgstr "Controlla una targa VFD"
@@ -108,3 +107,4 @@ msgstr "Nessun timer attivo"
 
 msgid "Unknown title"
 msgstr "Titolo sconosciuto"
+

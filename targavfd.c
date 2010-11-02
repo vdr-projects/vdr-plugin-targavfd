@@ -21,7 +21,7 @@
 #include "status.h"
 #include "setup.h"
 
-static const char *VERSION        = "0.0.6";
+static const char *VERSION        = "0.0.7";
 
 cPluginTargaVFD::cPluginTargaVFD(void)
 {
