@@ -1,6 +1,9 @@
 VDR Plugin 'targavfd' Revision History
 -------------------------------------
 
+2010-11-02: Version 0.0.7
+- Update italian translation (Support #445)
+
 2010-10-31: Version 0.0.6
 - Support spectrum analyzer visualization (need span-plugin)
 - Allow turn display off at night (Feature #175)
