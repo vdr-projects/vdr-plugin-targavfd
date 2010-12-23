@@ -21,12 +21,7 @@
 enum eWatchMode {
     eUndefined,
     eLiveTV,
-    eReplayNormal,
-    eReplayMusic,
-    eReplayDVD,
-    eReplayFile,
-    eReplayImage,
-    eReplayAudioCD
+    eReplay
 };
 
 enum eReplayState {

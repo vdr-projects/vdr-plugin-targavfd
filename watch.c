@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <time.h>
+#include <ctype.h>
 
 #include "watch.h"
 #include "setup.h"
@@ -462,22 +463,37 @@ bool cVFDWatch::Replay() {
   return false;
 }
 
-void cVFDWatch::Replaying(const cControl * Control, const char * Name, const char *FileName, bool On)
+char *striptitle(char *s)
+{
+  if (s && *s) {
+     for (char *p = s + strlen(s) - 1; p >= s; p--) {
+         if (isspace(*p) || *p == '~' || *p == '\\')
+           *p = 0;
+         else
+            break;
+         }
+     }
+  return s;
+}
+
+void cVFDWatch::Replaying(const cControl * Control, const char * szName, const char *FileName, bool On)
 {
     cMutexLooker m(mutex);
     m_bUpdateScreen = true;
     if (On)
     {
         m_pControl = (cControl *) Control;
-        m_eWatchMode = eReplayNormal;
+        m_eWatchMode = eReplay;
         if(replayTitle) {
           delete replayTitle;
           replayTitle = NULL;
         }
-        if (Name && !isempty(Name))
+        if (szName && !isempty(szName))
         {
+            char* Title = NULL;
+            char* Name = strdup(skipspace(szName));
+            striptitle(Name); // remove space at end
             int slen = strlen(Name);
-            bool bFound = false;
             ///////////////////////////////////////////////////////////////////////
             //Looking for mp3/muggle-plugin replay : [LS] (444/666) title
             //
@@ -485,66 +501,49 @@ void cVFDWatch::Replaying(const cControl * Control, const char * Name, const cha
                 *(Name+0)=='[' &&
                 *(Name+3)==']' &&
                 *(Name+5)=='(') {
-                unsigned int i;
+                int i;
                 for (i=6; *(Name + i) != '\0'; ++i) { //search for [xx] (xxxx) title
                     if (*(Name+i)==' ' && *(Name+i-1)==')') {
-                        bFound = true;
+                        if (slen > i) { //if name isn't empty, then copy
+                            Title = (Name + i);
+                        }
                         break;
                     }
-                }
-                if (bFound) { //found mp3/muggle-plugin
-                    if (strlen(Name+i) > 0) { //if name isn't empty, then copy
-                        replayTitle = new cString(skipspace(Name + i));
-                    }
-                    m_eWatchMode = eReplayMusic;
                 }
             }
             ///////////////////////////////////////////////////////////////////////
             //Looking for DVD-Plugin replay : 1/8 4/28,  de 2/5 ac3, no 0/7,  16:9, VOLUMENAME
-            // cDvdPlayerControl::GetDisplayHeaderLine
-            // titleinfo, audiolang, spulang, aspect, title
-            if (!bFound && slen>7)
+            // cDvdPlayerControl::GetDisplayHeaderLine : titleinfo, audiolang, spulang, aspect, title
+            if (!Title && slen>7)
             {
-                unsigned int i,n;
+                int i,n;
                 for (n=0,i=0;*(Name+i) != '\0';++i)
                 { //search volumelabel after 4*", " => xxx, xxx, xxx, xxx, title
                     if (*(Name+i)==' ' && *(Name+i-1)==',') {
                         if (++n == 4) {
-                            bFound = true;
+                            if (slen > i) {  // if name isn't empty, then copy
+                                Title = (Name + i);
+                            }
                             break;
                         }
                     }
                 }
-                if (bFound) //found DVD replay
-                {
-                    if (strlen(Name+i) > 0)
-                    { // if name isn't empty, then copy
-                        replayTitle = new cString(skipspace(Name + i));
-                    }
-                    m_eWatchMode = eReplayDVD;
-                }
             }
-            if (!bFound) {
-                int i;
-                for (i=slen-1;i>0;--i)
-                {   //search reverse last Subtitle
+            if (!Title) {
+                // look for file extentsion like .xxx or .xxxx
+                bool bIsFile = (slen>5 && ((*(Name+slen-4) == '.') || (*(Name+slen-5) == '.'))) ? true : false;
+
+                for (int i=slen-1;i>0;--i) {
+                    //search reverse last Subtitle
                     // - filename contains '~' => subdirectory
                     // or filename contains '/' => subdirectory
                     switch (*(Name+i)) {
-                        case '/': {
-                            // look for file extentsion like .xxx or .xxxx
-                            if (slen>5 && ((*(Name+slen-4) == '.') || (*(Name+slen-5) == '.')))
-                            {
-                                m_eWatchMode = eReplayFile;
-                            }
-                            else
-                            {
+                        case '/':
+                            if (!bIsFile) {
                                 break;
                             }
-                        }
                         case '~': {
-                            replayTitle = new cString(Name + i + 1);
-                            bFound = true;
+                            Title = (Name + i + 1);
                             i = 0;
                         }
                         default:
@@ -553,20 +552,17 @@ void cVFDWatch::Replaying(const cControl * Control, const char * Name, const cha
                 }
             }
 
-            if (0 == strncmp(Name,"[image] ",8)) {
-                if (m_eWatchMode != eReplayFile) //if'nt already Name stripped-down as filename
-                    replayTitle = new cString(Name + 8);
-                m_eWatchMode = eReplayImage;
-                bFound = true;
+            if (!Title && 0 == strncmp(Name,"[image] ",8)) {
+                Title = (Name + 8);
+            } else if (!Title && 0 == strncmp(Name,"[audiocd] ",10)) {
+                Title = (Name + 10);
             }
-            else if (0 == strncmp(Name,"[audiocd] ",10)) {
-                replayTitle = new cString(Name + 10);
-                m_eWatchMode = eReplayAudioCD;
-                bFound = true;
+            if (Title) {
+                replayTitle = new cString(skipspace(Title));
+            } else {
+                replayTitle = new cString(skipspace(Name));
             }
-            if (!bFound) {
-                replayTitle = new cString(Name);
-            }
+            free(Name);
         }
         if (!replayTitle) {
             replayTitle = new cString(tr("Unknown title"));
