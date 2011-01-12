@@ -603,29 +603,26 @@ eReplayState cVFDWatch::ReplayMode() const
   return eReplayNone;
 }
 
-bool cVFDWatch::ReplayPosition(int &current, int &total) const
+bool cVFDWatch::ReplayPosition(int &current, int &total, double& dFrameRate) const
 {
   if (m_pControl && ((cControl *)m_pControl)->GetIndex(current, total, false)) {
     total = (total == 0) ? 1 : total;
+#if VDRVERSNUM >= 10703
+    dFrameRate = ((cControl *)m_pControl)->FramesPerSecond();
+#endif
     return true;
   }
   return false;
 }
 
-const char * cVFDWatch::FormatReplayTime(int current, int total) const
+const char * cVFDWatch::FormatReplayTime(int current, int total, double dFrameRate) const
 {
     static char s[32];
-#if VDRVERSNUM >= 10701
-    int cs = (current / DEFAULTFRAMESPERSECOND);
-    int ts = (total / DEFAULTFRAMESPERSECOND);
-    bool g = (((current / DEFAULTFRAMESPERSECOND) / 3600) > 0)
-            || (((total / DEFAULTFRAMESPERSECOND) / 3600) > 0);
-#else
-    int cs = (current / FRAMESPERSEC);
-    int ts = (total / FRAMESPERSEC);
-    bool g = (((current / FRAMESPERSEC) / 3600) > 0)
-            || (((total / FRAMESPERSEC) / 3600) > 0);
-#endif
+
+    int cs = (int)((double)current / dFrameRate);
+    int ts = (int)((double)total / dFrameRate);
+    bool g = ((cs / 3600) > 0) || ((ts / 3600) > 0);
+
     int cm = cs / 60;
     cs %= 60;
     int tm = ts / 60;
@@ -650,8 +647,14 @@ const char * cVFDWatch::FormatReplayTime(int current, int total) const
 
 bool cVFDWatch::ReplayTime() {
     int current = 0,total = 0;
-    if(ReplayPosition(current,total)) {
-      const char * sz = FormatReplayTime(current,total);
+    double dFrameRate;
+#if VDRVERSNUM >= 10701
+    dFrameRate = DEFAULTFRAMESPERSECOND;
+#else
+    dFrameRate = FRAMESPERSEC;
+#endif
+    if(ReplayPosition(current,total,dFrameRate)) {
+      const char * sz = FormatReplayTime(current,total,dFrameRate);
       if(!replayTime || strcmp(sz,*replayTime)) {
         if(replayTime)
           delete replayTime;

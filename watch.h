@@ -97,10 +97,10 @@ protected:
   bool RenderScreen(bool bReDraw);
   bool RenderSpectrumAnalyzer();
   eReplayState ReplayMode() const;
-  bool ReplayPosition(int &current, int &total) const;
+  bool ReplayPosition(int &current, int &total, double& dFrameRate) const;
   bool CurrentTime(time_t ts);
   bool ReplayTime();
-  const char * FormatReplayTime(int current, int total) const;
+  const char * FormatReplayTime(int current, int total, double dFrameRate) const;
 public:
   cVFDWatch();
   virtual ~cVFDWatch();
