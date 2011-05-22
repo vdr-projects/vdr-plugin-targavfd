@@ -1,7 +1,7 @@
 #
 # Makefile for targavfd plugin to VDR (C++)
 #
-# (C) 2010 Andreas Brachold <vdr07 AT deltab de>
+# (C) 2010-2011 Andreas Brachold <vdr07 AT deltab de>
 #
 # This plugin is free software: you can redistribute it and/or 
 # modify it under the terms of the GNU General Public License as published 
@@ -57,8 +57,8 @@ DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 INCLUDES += $(shell freetype-config --cflags)
 LIBS += $(shell freetype-config --libs)
 
-INCLUDES += $(shell pkg-config --cflags libhid)
-LIBS += $(shell pkg-config --libs libhid)
+INCLUDES += $(shell pkg-config --cflags libusb-1.0)
+LIBS += $(shell pkg-config --libs libusb-1.0)
 DEFINES += -DHAVE_STDBOOL_H
 
 ### The object files (add further files here):

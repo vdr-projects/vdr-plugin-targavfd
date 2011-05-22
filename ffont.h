@@ -15,6 +15,7 @@
 #ifndef __VFD_FONT_H___
 #define __VFD_FONT_H___
 
+#include <vdr/config.h>
 #include <vdr/font.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -66,6 +67,9 @@ private:
   int Kerning(cVFDGlyph *Glyph, uint PrevSym) const;
   cVFDGlyph* Glyph(uint CharCode) const;
   virtual void DrawText(cBitmap*, int, int, const char*, tColor, tColor, int) const {};
+#if APIVERSNUM >= 10717
+  virtual void DrawText(cPixmap*, int, int, const char*, tColor, tColor, int) const {};
+#endif
 public:
   cVFDFont(const char *Name, int CharHeight, int CharWidth = 0);
   virtual ~cVFDFont();

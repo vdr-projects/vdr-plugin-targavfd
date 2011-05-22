@@ -24,12 +24,12 @@ targavfd is a plugin for the Video Disc Recorder and shows information
 about the current state of VDR on Targa USB Graphic Vacuum Fluorescent Display.
 
 
-Install libhid:
+Install libusb-1.0:
 -------------------------------------
-You need installed library libhid to use the vdr-plugin-targavfd.
-This library libhid is used to access and interact with a USB HID device.
+You need installed library libusb-1.0 to use the vdr-plugin-targavfd.
+This library libusb-1.0 is used to access and interact with a USB device.
 
-1. http://libhid.alioth.debian.org/
+1. http://www.libusb.org/wiki/libusb-1.0
 
 Install vdr-plugin-targavfd:
 ---------------------------

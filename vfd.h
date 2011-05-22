@@ -1,7 +1,7 @@
 /*
  * targavfd plugin for VDR (C++)
  *
- * (C) 2010 Andreas Brachold <vdr07 AT deltab de>
+ * (C) 2010-2011 Andreas Brachold <vdr07 AT deltab de>
  *
  * This targavfd plugin is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU General Public License as published 
@@ -15,7 +15,7 @@
 #define __VFD_H_
 
 #include <queue>
-#include <hid.h>
+#include <libusb-1.0/libusb.h>
 #include "bitmap.h"
 
 enum eIcons {
@@ -49,21 +49,20 @@ enum eIcons {
 
 class cVFDFont;
 
-class cVFDQueue : public std::queue<byte> {
-  HIDInterface* hid;
-  bool bInit;
+class cVFDQueue : public std::queue<unsigned char> {
+  struct libusb_device_handle* devh;
 public:
   cVFDQueue();
   virtual ~cVFDQueue();
 protected:
   virtual bool open();
   virtual void close();
-  virtual bool isopen() const { return hid != 0; }
-  void QueueCmd(const byte & cmd);
-  void QueueData(const byte & data);
+  virtual bool isopen() const { return devh != NULL; }
+  void QueueCmd(const unsigned char & cmd);
+  void QueueData(const unsigned char & data);
   bool QueueFlush();
 private:
-  const char *hiderror(hid_return ret) const;
+  const char *usberror(int ret) const;
 };
 
 class cVFD : public cVFDQueue {

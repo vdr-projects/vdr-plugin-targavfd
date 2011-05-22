@@ -1,7 +1,7 @@
 /*
  * targavfd plugin for VDR (C++)
  *
- * (C) 2010 Andreas Brachold <vdr07 AT deltab de>
+ * (C) 2010-2011 Andreas Brachold <vdr07 AT deltab de>
 
  * This targavfd plugin is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU General Public License as published 
@@ -23,58 +23,73 @@
 #include "ffont.h"
 #include "vfd.h"
 
-static const byte ICON_PLAY       = 0x00; //Play
-static const byte ICON_PAUSE      = 0x01; //Pause
-static const byte ICON_RECORD     = 0x02; //Record
-static const byte ICON_MESSAGE    = 0x03; //Message symbol (without the inner @)
-static const byte ICON_MSGAT      = 0x04; //Message @
-static const byte ICON_MUTE       = 0x05; //Mute
-static const byte ICON_WLAN1      = 0x06; //WLAN (tower base)
-static const byte ICON_WLAN2      = 0x07; //WLAN strength (1 of 3)
-static const byte ICON_WLAN3      = 0x08; //WLAN strength (2 of 3)
-static const byte ICON_WLAN4      = 0x09; //WLAN strength (3 of 3)
-static const byte ICON_VOLUME     = 0x0A; //Volume (the word)
-static const byte ICON_VOL1       = 0x0B; //Volume level 1 of 14
-static const byte ICON_VOL2       = 0x0C; //Volume level 2 of 14
-static const byte ICON_VOL3       = 0x0D; //Volume level 3 of 14
-static const byte ICON_VOL4       = 0x0E; //Volume level 4 of 14
-static const byte ICON_VOL5       = 0x0F; //Volume level 5 of 14
-static const byte ICON_VOL6       = 0x10; //Volume level 6 of 14
-static const byte ICON_VOL7       = 0x11; //Volume level 7 of 14
-static const byte ICON_VOL8       = 0x12; //Volume level 8 of 14
-static const byte ICON_VOL9       = 0x13; //Volume level 9 of 14
-static const byte ICON_VOL10      = 0x14; //Volume level 10 of 14
-static const byte ICON_VOL11      = 0x15; //Volume level 11 of 14
-static const byte ICON_VOL12      = 0x16; //Volume level 12 of 14
-static const byte ICON_VOL13      = 0x17; //Volume level 13 of 14
-static const byte ICON_VOL14      = 0x18; //Volume level 14 of 14
+// Values for transaction's data packet.
+static const int CONTROL_REQUEST_TYPE_OUT = LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
 
-static const byte STATE_OFF       = 0x00; //Symbol off
-static const byte STATE_ON        = 0x01; //Symbol on
-static const byte STATE_ONHIGH    = 0x02; //Symbol on, high intensity, can only be used with the volume symbols
+// From the HID spec:
+static const int HID_SET_REPORT = 0x09;
+static const int HID_REPORT_TYPE_OUTPUT = 0x02;
 
-static const byte CMD_PREFIX      = 0x1b;
-static const byte CMD_SETCLOCK    = 0x00; //Actualize the time of the display
-static const byte CMD_SMALLCLOCK  = 0x01; //Display small clock on display
-static const byte CMD_BIGCLOCK    = 0x02; //Display big clock on display
-static const byte CMD_SETSYMBOL   = 0x30; //Enable or disable symbol
-static const byte CMD_SETDIMM     = 0x40; //Set the dimming level of the display
-static const byte CMD_RESET       = 0x50; //Reset all configuration data to default and clear
-static const byte CMD_SETRAM      = 0x60; //Set the actual graphics RAM offset for next data write
-static const byte CMD_SETPIXEL    = 0x70; //Write pixel data to RAM of the display
-static const byte CMD_TEST1       = 0xf0; //Show vertical test pattern
-static const byte CMD_TEST2       = 0xf1; //Show horizontal test pattern
+static const int MAX_CONTROL_OUT_TRANSFER_SIZE = 63;
 
-static const byte TIME_12         = 0x00; //12 hours format
-static const byte TIME_24         = 0x01; //24 hours format
+static const int INTERFACE_NUMBER = 0;
+static const int TIMEOUT_MS = 5000;
 
-static const byte BRIGHT_OFF      = 0x00; //Display off
-static const byte BRIGHT_DIMM     = 0x01; //Display dimmed
-static const byte BRIGHT_FULL     = 0x02; //Display full brightness
+// Defines from display datasheet
+static const int VENDOR_ID = 0x019c2;
+static const int PRODUCT_ID = 0x06a11;
+
+static const unsigned char ICON_PLAY       = 0x00; //Play
+static const unsigned char ICON_PAUSE      = 0x01; //Pause
+static const unsigned char ICON_RECORD     = 0x02; //Record
+static const unsigned char ICON_MESSAGE    = 0x03; //Message symbol (without the inner @)
+static const unsigned char ICON_MSGAT      = 0x04; //Message @
+static const unsigned char ICON_MUTE       = 0x05; //Mute
+static const unsigned char ICON_WLAN1      = 0x06; //WLAN (tower base)
+static const unsigned char ICON_WLAN2      = 0x07; //WLAN strength (1 of 3)
+static const unsigned char ICON_WLAN3      = 0x08; //WLAN strength (2 of 3)
+static const unsigned char ICON_WLAN4      = 0x09; //WLAN strength (3 of 3)
+static const unsigned char ICON_VOLUME     = 0x0A; //Volume (the word)
+static const unsigned char ICON_VOL1       = 0x0B; //Volume level 1 of 14
+static const unsigned char ICON_VOL2       = 0x0C; //Volume level 2 of 14
+static const unsigned char ICON_VOL3       = 0x0D; //Volume level 3 of 14
+static const unsigned char ICON_VOL4       = 0x0E; //Volume level 4 of 14
+static const unsigned char ICON_VOL5       = 0x0F; //Volume level 5 of 14
+static const unsigned char ICON_VOL6       = 0x10; //Volume level 6 of 14
+static const unsigned char ICON_VOL7       = 0x11; //Volume level 7 of 14
+static const unsigned char ICON_VOL8       = 0x12; //Volume level 8 of 14
+static const unsigned char ICON_VOL9       = 0x13; //Volume level 9 of 14
+static const unsigned char ICON_VOL10      = 0x14; //Volume level 10 of 14
+static const unsigned char ICON_VOL11      = 0x15; //Volume level 11 of 14
+static const unsigned char ICON_VOL12      = 0x16; //Volume level 12 of 14
+static const unsigned char ICON_VOL13      = 0x17; //Volume level 13 of 14
+static const unsigned char ICON_VOL14      = 0x18; //Volume level 14 of 14
+
+static const unsigned char STATE_OFF       = 0x00; //Symbol off
+static const unsigned char STATE_ON        = 0x01; //Symbol on
+static const unsigned char STATE_ONHIGH    = 0x02; //Symbol on, high intensity, can only be used with the volume symbols
+
+static const unsigned char CMD_PREFIX      = 0x1b;
+static const unsigned char CMD_SETCLOCK    = 0x00; //Actualize the time of the display
+static const unsigned char CMD_SMALLCLOCK  = 0x01; //Display small clock on display
+static const unsigned char CMD_BIGCLOCK    = 0x02; //Display big clock on display
+static const unsigned char CMD_SETSYMBOL   = 0x30; //Enable or disable symbol
+static const unsigned char CMD_SETDIMM     = 0x40; //Set the dimming level of the display
+static const unsigned char CMD_RESET       = 0x50; //Reset all configuration data to default and clear
+static const unsigned char CMD_SETRAM      = 0x60; //Set the actual graphics RAM offset for next data write
+static const unsigned char CMD_SETPIXEL    = 0x70; //Write pixel data to RAM of the display
+static const unsigned char CMD_TEST1       = 0xf0; //Show vertical test pattern
+static const unsigned char CMD_TEST2       = 0xf1; //Show horizontal test pattern
+
+static const unsigned char TIME_12         = 0x00; //12 hours format
+static const unsigned char TIME_24         = 0x01; //24 hours format
+
+static const unsigned char BRIGHT_OFF      = 0x00; //Display off
+static const unsigned char BRIGHT_DIMM     = 0x01; //Display dimmed
+static const unsigned char BRIGHT_FULL     = 0x02; //Display full brightness
 
 cVFDQueue::cVFDQueue() {
-	hid = NULL;
-  bInit = false;
+	devh = NULL;
 }
 
 cVFDQueue::~cVFDQueue() {
@@ -83,74 +98,75 @@ cVFDQueue::~cVFDQueue() {
 
 bool cVFDQueue::open()
 {
-  HIDInterfaceMatcher matcher = { 0x19c2, 0x6a11, NULL, NULL, 0 };
-  hid_return ret;
+	int result;
+	bool ready = false;
 
-  /* see include/debug.h for possible values */
-  hid_set_debug(HID_DEBUG_NONE);
-  hid_set_debug_stream(0);
-  /* passed directly to libusb */
-  hid_set_usb_debug(0);
+  dsyslog("targaVFD: scanning for Futaba MDM166A...");
   
-  ret = hid_init();
-  if (ret != HID_RET_SUCCESS) {
-    esyslog("targaVFD: init - %s (%d)", hiderror(ret), ret);
-    return false;
-  }
-  bInit = true;
-
-  hid = hid_new_HIDInterface();
-  if (hid == 0) {
-    esyslog("targaVFD: hid_new_HIDInterface() failed, out of memory?\n");
-    return false;
-  }
-
-  ret = hid_force_open(hid, 0, &matcher, 3);
-  if (ret != HID_RET_SUCCESS) {
-    esyslog("targaVFD: open - %s (%d)", hiderror(ret), ret);
-    hid_close(hid);
-    hid_delete_HIDInterface(&hid);
-    hid = 0;
-    return false;
+  //Initialize libusb
+	result = libusb_init(NULL);
+	if (result >= 0)
+	{
+		devh = libusb_open_device_with_vid_pid(NULL, VENDOR_ID, PRODUCT_ID);
+		if (devh != NULL)
+		{
+			// a targavfd has been detected.
+			// Detach the hidusb driver from the HID to enable using libusb.
+			libusb_detach_kernel_driver(devh, INTERFACE_NUMBER);
+			{
+				result = libusb_claim_interface(devh, INTERFACE_NUMBER);
+				if (result >= 0)
+				{
+					ready = true;
+				}
+				else
+				{
+    			esyslog("targaVFD: libusb_claim_interface error! %s (%d)",usberror(result),result);
+				}
+			}
+		}
+		else
+		{
+			esyslog("targaVFD: Unable to find the device!");
+		}
+	}
+	else
+	{
+		esyslog("targaVFD: Unable to initialize libusb! %s (%d)",usberror(result),result);
+	}
+  if(!ready) {
+    if(devh)  
+		  libusb_release_interface(devh, 0);
+    devh = NULL;
   }
 
   while (!empty()) {
     pop();
   }
-  //ret = hid_write_identification(stdout, hid);
-  //if (ret != HID_RET_SUCCESS) {
-  //  esyslog("targaVFD: write_identification %s (%d)", hiderror(ret), ret);
-  //  return false;
-  //}
-  return true;
+
+  return ready;
 }
 
 void cVFDQueue::close() {
-  hid_return ret;
-  if (hid != 0) {
-    ret = hid_close(hid);
-    if (ret != HID_RET_SUCCESS) {
-      esyslog("targaVFD: close - %s (%d)", hiderror(ret), ret);
-    }
 
-    hid_delete_HIDInterface(&hid);
-    hid = 0;
+  if (devh != NULL) {
+      int result = libusb_release_interface(devh, 0);
+			if (result < 0)
+			{
+  			esyslog("targaVFD: libusb_release_interface failed! %s (%d)",usberror(result),result);
+			}
+      devh = NULL;
   }
-  if(bInit) {
-    ret = hid_cleanup();
-    if (ret != HID_RET_SUCCESS) {
-      esyslog("targaVFD: cleanup - %s (%d)", hiderror(ret), ret);
-    }
-    bInit = false;
-  }
+  // Deinitialize libusb 
+	libusb_exit(NULL);
 }
 
-void cVFDQueue::QueueCmd(const byte & cmd) {
+void cVFDQueue::QueueCmd(const unsigned char & cmd) {
   this->push(CMD_PREFIX);
   this->push(cmd);
 }
 
-void cVFDQueue::QueueData(const byte & data) {
+void cVFDQueue::QueueData(const unsigned char & data) {
   this->push(data);
 }
 
@@ -162,84 +178,85 @@ bool cVFDQueue::QueueFlush() {
     return false;
   }
 
-  int const PATH_OUT[1] = { 0xff7f0004 };
-  char buf[64];
-  hid_return ret;
-
+	int bytes;
+	unsigned char buf[MAX_CONTROL_OUT_TRANSFER_SIZE+1];	
+  
   while (!empty()) {
-    buf[0] = (char) std::min((size_t)63,size());
+    buf[0] = (unsigned char) std::min((size_t)MAX_CONTROL_OUT_TRANSFER_SIZE,size());
     for(unsigned int i = 0;i < 63 && !empty();++i) {
       buf[i+1] = (char) front(); //the first element in the queue
       pop();              //remove the first element of the queue
     }
-    ret = hid_set_output_report(hid, PATH_OUT, sizeof(PATH_OUT), buf, (buf[0] + 1));
-    if (ret != HID_RET_SUCCESS) {
-      esyslog("targaVFD: set_output_report - %s (%d)", hiderror(ret), ret);
+
+	  bytes = libusb_control_transfer(
+			  devh,
+			  CONTROL_REQUEST_TYPE_OUT ,
+			  HID_SET_REPORT,
+			  (HID_REPORT_TYPE_OUTPUT<<8)|0x00,
+			  INTERFACE_NUMBER,
+			  buf,
+			  (((int)buf[0]) + 1),
+			  TIMEOUT_MS);
+
+	  if (bytes <= 0)
+	  {
+      esyslog("targaVFD: libusb_control_transfer failed : %s (%d)",usberror(bytes),bytes);
       while (!empty()) {
         pop();
       }
       cVFDQueue::close();
       return false;
-    }
+	  }
   }
   return true;
 }
 
-const char *cVFDQueue::hiderror(hid_return ret) const
+const char *cVFDQueue::usberror(int ret) const
 {
   switch(ret) {
-    case HID_RET_SUCCESS:
-      return "success";
-    case HID_RET_INVALID_PARAMETER:
-      return "invalid parameter";
-    case HID_RET_NOT_INITIALISED:
-      return "not initialized";
-    case HID_RET_ALREADY_INITIALISED:
-      return "hid_init() already called";
-    case HID_RET_FAIL_FIND_BUSSES:
-      return "failed to find any USB busses";
-    case HID_RET_FAIL_FIND_DEVICES:
-      return "failed to find any USB devices";
-    case HID_RET_FAIL_OPEN_DEVICE:
-      return "failed to open device";
-    case HID_RET_DEVICE_NOT_FOUND:
-      return "device not found";
-    case HID_RET_DEVICE_NOT_OPENED:
-      return "device not yet opened";
-    case HID_RET_DEVICE_ALREADY_OPENED:
-      return "device already opened";
-    case HID_RET_FAIL_CLOSE_DEVICE:
-      return "could not close device";
-    case HID_RET_FAIL_CLAIM_IFACE:
-      return "failed to claim interface; is another driver using it?";
-    case HID_RET_FAIL_DETACH_DRIVER:
-      return "failed to detach kernel driver";
-    case HID_RET_NOT_HID_DEVICE:
-      return "not recognized as a HID device";
-    case HID_RET_HID_DESC_SHORT:
-      return "HID interface descriptor too short";
-    case HID_RET_REPORT_DESC_SHORT:
-      return "HID report descriptor too short";
-    case HID_RET_REPORT_DESC_LONG:
-      return "HID report descriptor too long";
-    case HID_RET_FAIL_ALLOC:
-      return "failed to allocate memory";
-    case HID_RET_OUT_OF_SPACE:
-      return "no space left in buffer";
-    case HID_RET_FAIL_SET_REPORT:
-      return "failed to set report";
-    case HID_RET_FAIL_GET_REPORT:
-      return "failed to get report";
-    case HID_RET_FAIL_INT_READ:
-      return "interrupt read failed";
-    case HID_RET_NOT_FOUND:
-      return "not found";
-#ifdef HID_RET_TIMEOUT
-    case HID_RET_TIMEOUT:
-      return "timeout";
-#endif
-  }
-  return "unknown error";
+    case LIBUSB_SUCCESS:
+      return "Success (no error).";
+
+    case LIBUSB_ERROR_IO:
+      return "Input/output error.";
+
+    case LIBUSB_ERROR_INVALID_PARAM: 	
+      return "Invalid parameter.";
+
+    case LIBUSB_ERROR_ACCESS:
+      return "Access denied (insufficient permissions).";
+
+    case LIBUSB_ERROR_NO_DEVICE:
+      return "No such device (it may have been disconnected).";
+
+    case LIBUSB_ERROR_NOT_FOUND:
+      return "Entity not found.";
+
+    case LIBUSB_ERROR_BUSY:
+      return "Resource busy.";
+
+    case LIBUSB_ERROR_TIMEOUT:
+      return "Operation timed out.";
+
+    case LIBUSB_ERROR_OVERFLOW:
+      return "Overflow.";
+
+    case LIBUSB_ERROR_PIPE: 	
+      return "Pipe error.";
+
+    case LIBUSB_ERROR_INTERRUPTED:
+      return "System call interrupted (perhaps due to signal).";
+
+    case LIBUSB_ERROR_NO_MEM:
+      return "Insufficient memory.";
+
+    case LIBUSB_ERROR_NOT_SUPPORTED:
+      return "Operation not supported or unimplemented on this platform.";
+
+    case LIBUSB_ERROR_OTHER:
+      return "Other error. ";
+    }
+    return "unknown error";
 }
 
 cVFD::cVFD() 
@@ -306,8 +323,8 @@ bool cVFD::SendCmdShutdown() {
 	return QueueFlush();
 }
 
-inline byte toBCD(int x){ 
- return (byte)(((x) / 10 * 16) + ((x) % 10));
+inline unsigned char toBCD(int x){ 
+ return (unsigned char)(((x) / 10 * 16) + ((x) % 10));
 }
 
 /*
@@ -349,7 +366,7 @@ void cVFD::close()
     framebuf = NULL;
   }
   if(backingstore) {
-    delete backingstore;
+    delete[] backingstore;
     backingstore = NULL;
   }
 
@@ -509,7 +526,7 @@ void cVFD::Brightness(int nBrightness)
 		nBrightness = 2;
 	}
   this->QueueCmd(CMD_SETDIMM);
-  this->QueueData((byte) (nBrightness));
+  this->QueueData((unsigned char) (nBrightness));
 }
 
 bool cVFD::SetFont(const char *szFont, bool bTwoLineMode, int nBigFontHeight, int nSmallFontHeight) {
