@@ -51,6 +51,7 @@ class cVFDFont;
 
 class cVFDQueue : public std::queue<unsigned char> {
   struct libusb_device_handle* devh;
+    bool bInit;
 public:
   cVFDQueue();
   virtual ~cVFDQueue();

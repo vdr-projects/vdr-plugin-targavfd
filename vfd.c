@@ -30,7 +30,7 @@ static const int CONTROL_REQUEST_TYPE_OUT = LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST
 static const int HID_SET_REPORT = 0x09;
 static const int HID_REPORT_TYPE_OUTPUT = 0x02;
 
-static const int MAX_CONTROL_OUT_TRANSFER_SIZE = 63;
+static const int unsigned MAX_CONTROL_OUT_TRANSFER_SIZE = 63;
 
 static const int INTERFACE_NUMBER = 0;
 static const int TIMEOUT_MS = 5000;
@@ -90,6 +90,7 @@ static const unsigned char BRIGHT_FULL     = 0x02; //Display full brightness
 
 cVFDQueue::cVFDQueue() {
 	devh = NULL;
+    bInit = false;
 }
 
 cVFDQueue::~cVFDQueue() {
@@ -102,7 +103,7 @@ bool cVFDQueue::open()
 	bool ready = false;
 
   dsyslog("targaVFD: scanning for Futaba MDM166A...");
-  
+  bInit = true;
   //Initialize libusb
 	result = libusb_init(NULL);
 	if (result >= 0)
@@ -155,10 +156,14 @@ void cVFDQueue::close() {
 			{
   			esyslog("targaVFD: libusb_release_interface failed! %s (%d)",usberror(result),result);
 			}
+      libusb_close(devh);
       devh = NULL;
   }
-  // Deinitialize libusb 
-	libusb_exit(NULL);
+  if(bInit) {
+      // Deinitialize libusb 
+      libusb_exit(NULL);
+      bInit = false;
+  }
 }
 
 void cVFDQueue::QueueCmd(const unsigned char & cmd) {
@@ -183,7 +188,7 @@ bool cVFDQueue::QueueFlush() {
   
   while (!empty()) {
     buf[0] = (unsigned char) std::min((size_t)MAX_CONTROL_OUT_TRANSFER_SIZE,size());
-    for(unsigned int i = 0;i < 63 && !empty();++i) {
+    for(unsigned int i = 0;i < MAX_CONTROL_OUT_TRANSFER_SIZE && !empty();++i) {
       buf[i+1] = (char) front(); //the first element in the queue
       pop();              //remove the first element of the queue
     }
