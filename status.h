@@ -24,7 +24,11 @@ class cVFDStatusMonitor : public cStatus {
  public: 
   cVFDStatusMonitor(cVFDWatch*    pDev);
  protected:
+#if VDRVERSNUM >= 10726
+  virtual void ChannelSwitch(const cDevice *Device, int ChannelNumber, bool LiveView);
+#else
   virtual void ChannelSwitch(const cDevice *Device, int ChannelNumber);
+#endif
   virtual void Recording(const cDevice *pDevice, const char *szName, const char *szFileName, bool bOn);
   virtual void Replaying(const cControl *pControl, const char *szName, const char *szFileName, bool bOn);
   virtual void SetVolume(int Volume, bool Absolute);
