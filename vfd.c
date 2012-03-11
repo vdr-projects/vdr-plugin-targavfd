@@ -266,8 +266,10 @@ const char *cVFDQueue::usberror(int ret) const
 
 cVFD::cVFD() 
 {
-	this->pFont = NULL;
-	this->lastIconState = 0;
+  pFont = NULL;
+  lastIconState = 0;
+  framebuf = NULL;
+  backingstore = NULL;
 }
 
 cVFD::~cVFD() {
