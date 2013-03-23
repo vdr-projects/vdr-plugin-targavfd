@@ -1,6 +1,12 @@
 VDR Plugin 'targavfd' Revision History
 -------------------------------------
 
+2013-03-23: Version 0.2.0
+- Adapt Makefile for new VDR >=1.7.36
+- Fix bug: close crash without open device.
+- Update plugin interface for vdr 1.7.26
+- Closing of libusb corrected
+
 2011-05-22: Version 0.1.0
 - Drop dependency to libhid, now is libusb-1.0 used
 - Wrong time on playback of HD recordings (Bug #517)
