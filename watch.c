@@ -683,7 +683,7 @@ void cVFDWatch::Recording(const cDevice *pDevice, const char *szName, const char
     }
   }
   else {
-    esyslog("targaVFD: Recording: only up to %d devices are supported by this plugin", memberof(m_nCardIsRecording));
+    esyslog("targaVFD: Recording: only up to %lu devices are supported by this plugin", (unsigned long)memberof(m_nCardIsRecording));
   }
 }
 
