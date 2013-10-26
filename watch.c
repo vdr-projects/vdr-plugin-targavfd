@@ -630,14 +630,22 @@ const char * cVFDWatch::FormatReplayTime(int current, int total, double dFrameRa
 
     if (total > 1) {
       if(g) {
+#if VDRVERSNUM >= 10703
+        snprintf(s, sizeof(s), "%s (%s)", (const char*)IndexToHMSF(current,false,dFrameRate), (const char*)IndexToHMSF(total,false,dFrameRate));
+#else
         snprintf(s, sizeof(s), "%s (%s)", (const char*)IndexToHMSF(current), (const char*)IndexToHMSF(total));
+#endif
       } else {
         snprintf(s, sizeof(s), "%02d:%02d (%02d:%02d)", cm, cs, tm, ts);
       } 
     }
     else {
       if(g) {
+#if VDRVERSNUM >= 10703
+        snprintf(s, sizeof(s), "%s", (const char*)IndexToHMSF(current,false,dFrameRate));
+#else
         snprintf(s, sizeof(s), "%s", (const char*)IndexToHMSF(current));
+#endif
       } else {
         snprintf(s, sizeof(s), "%02d:%02d", cm, cs);
       }

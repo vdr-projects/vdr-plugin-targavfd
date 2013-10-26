@@ -1,6 +1,8 @@
 VDR Plugin 'targavfd' Revision History
 -------------------------------------
 
+- Fix display wrong time for HD recording if they greater than one hour (Bug #1568)
+
 2013-04-12: Version 0.2.1
 - On amd64 linker binds not libusb (Bug #1338)
 - Fix warning on amd64: format '%d' expects argument of type 'int'... [-Wformat]
