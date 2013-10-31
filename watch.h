@@ -79,6 +79,8 @@ private:
   bool  m_bVolumeMute;
   time_t  tsVolumeLast;
 
+  int   m_nReplayCurrent;
+  int   m_nReplayTotal;
 
   cString*    osdTitle;
   cString*    osdItem;

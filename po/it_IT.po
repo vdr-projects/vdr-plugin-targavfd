@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-targavfd-plugin 0.0.5\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2010-11-19 19:25+0100\n"
+"POT-Creation-Date: 2013-10-31 18:43+0100\n"
 "PO-Revision-Date: 2010-11-01 22:55+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: \n"
@@ -76,14 +76,17 @@ msgstr "Modalità d'uscita"
 msgid "Never"
 msgstr "Mai"
 
-msgid "Timed"
-msgstr "Temporizzato"
+msgid "as volume short time"
+msgstr ""
 
-msgid "Ever"
-msgstr "Sempre"
+msgid "as volume"
+msgstr ""
 
-msgid "Show volume bargraph"
-msgstr "Mostra grafico a barre del volume"
+msgid "as replay progress"
+msgstr ""
+
+msgid "Show bargraph"
+msgstr ""
 
 msgid "Resume on activities"
 msgstr "Riprendi attività"
@@ -108,3 +111,12 @@ msgstr "Nessun timer attivo"
 
 msgid "Unknown title"
 msgstr "Titolo sconosciuto"
+
+#~ msgid "Timed"
+#~ msgstr "Temporizzato"
+
+#~ msgid "Ever"
+#~ msgstr "Sempre"
+
+#~ msgid "Show volume bargraph"
+#~ msgstr "Mostra grafico a barre del volume"

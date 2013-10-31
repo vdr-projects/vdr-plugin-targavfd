@@ -1,7 +1,7 @@
 /*
  * targavfd plugin for VDR (C++)
  *
- * (C) 2010 Andreas Brachold <vdr07 AT deltab de>
+ * (C) 2010-2013 Andreas Brachold <vdr07 AT deltab de>
  *
  * This targavfd plugin is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU General Public License as published 
@@ -276,10 +276,11 @@ cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
 
   static const char * szVolumeMode[eVolumeMode_LASTITEM];
   szVolumeMode[eVolumeMode_ShowNever] = tr("Never");
-  szVolumeMode[eVolumeMode_ShowTimed] = tr("Timed");
-  szVolumeMode[eVolumeMode_ShowEver]  = tr("Ever");
+  szVolumeMode[eVolumeMode_ShowTimed] = tr("as volume short time");
+  szVolumeMode[eVolumeMode_ShowEver]  = tr("as volume");
+  szVolumeMode[eVolumeMode_Progress]  = tr("as replay progress");
 
-  Add(new cMenuEditStraItem (tr("Show volume bargraph"),           
+  Add(new cMenuEditStraItem (tr("Show bargraph"),           
         &m_tmpSetup.m_nVolumeMode,
         memberof(szVolumeMode), szVolumeMode));
 

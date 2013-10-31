@@ -249,14 +249,15 @@ void cVFDWatch::Action(void)
       }
 
       if(!bSuspend) { 
-    	  // every second the clock need updates.
-    	  if (theSetup.m_nRenderMode == eRenderMode_DualLine) {
+          // every second the clock need updates.
           if((0 == (nCnt % 2))) {
             bReDraw = CurrentTime(ts);
             if(m_eWatchMode != eLiveTV) {
-              bReDraw |= ReplayTime();
+               bReDraw |= ReplayTime();
+            } else {
+               m_nReplayCurrent = ts - chPresentTime;
+               m_nReplayTotal = chFollowingTime - chPresentTime;
             }
-          }
         }
 
         bFlush = RenderScreen(bReDraw);
@@ -289,19 +290,34 @@ void cVFDWatch::Action(void)
         }
 
         // update volume - bargraph or mute symbol
-		    if(theSetup.m_nVolumeMode != eVolumeMode_ShowNever) { 
-          if(m_bVolumeMute) {
-            nIcons |= eIconMUTE;
-          } else {
-		        if(theSetup.m_nVolumeMode == eVolumeMode_ShowEver 
-			        || ( theSetup.m_nVolumeMode == eVolumeMode_ShowTimed
-				        && (ts - tsVolumeLast) < 15 )) { // if timed - delay 15 seconds
-      		    nIcons |= eIconVOLUME;
-      		    const int nVolSteps = (MAXVOLUME/14);
-      		    nIcons |= (((1 << (m_nLastVolume / nVolSteps)) - 1) << 0x0B);
-      			}
-          }
+        if(m_bVolumeMute) {
+          nIcons |= eIconMUTE;
         }
+        switch(theSetup.m_nVolumeMode)
+        {
+            case eVolumeMode_ShowTimed: {
+              if((ts - tsVolumeLast) > 15 )
+                break;
+            }
+            case eVolumeMode_ShowEver: {
+              const int nVolSteps = (MAXVOLUME/14);
+              nIcons |= eIconVOLUME;
+              nIcons |= (((1 << (m_nLastVolume / nVolSteps)) - 1) << 0x0B);
+              break;
+            }
+            case eVolumeMode_Progress: {
+              const int nBarSteps = (m_nReplayTotal/14);
+              if(nBarSteps > 0) {
+                nIcons |= (((1 << (m_nReplayCurrent / nBarSteps)) - 1) << 0x0B);
+              }
+              break;
+            }
+            case eVolumeMode_ShowNever:
+            default :
+             break;
+        }
+
+
       }
 
       // Set Brightness if setup value changed or display set to suspend
@@ -654,15 +670,16 @@ const char * cVFDWatch::FormatReplayTime(int current, int total, double dFrameRa
 }
 
 bool cVFDWatch::ReplayTime() {
-    int current = 0,total = 0;
     double dFrameRate;
 #if VDRVERSNUM >= 10701
     dFrameRate = DEFAULTFRAMESPERSECOND;
 #else
     dFrameRate = FRAMESPERSEC;
 #endif
-    if(ReplayPosition(current,total,dFrameRate)) {
-      const char * sz = FormatReplayTime(current,total,dFrameRate);
+    m_nReplayCurrent = 0;
+    m_nReplayTotal = 0;
+    if(ReplayPosition(m_nReplayCurrent,m_nReplayTotal,dFrameRate)) {
+      const char * sz = FormatReplayTime(m_nReplayCurrent,m_nReplayTotal,dFrameRate);
       if(!replayTime || strcmp(sz,*replayTime)) {
         if(replayTime)
           delete replayTime;

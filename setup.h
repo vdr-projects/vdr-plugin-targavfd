@@ -1,7 +1,7 @@
 /*
  * targavfd plugin for VDR (C++)
  *
- * (C) 2010 Andreas Brachold <vdr07 AT deltab de>
+ * (C) 2010-2013 Andreas Brachold <vdr07 AT deltab de>
  *
  * This targavfd plugin is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU General Public License as published 
@@ -30,6 +30,7 @@ enum eVolumeMode {
    eVolumeMode_ShowNever   /**< Show the volume bar never */
   ,eVolumeMode_ShowTimed   /**< Show the volume bar short time */
   ,eVolumeMode_ShowEver    /**< Show the volume bar ever */
+  ,eVolumeMode_Progress    /**< Show the volume bar as time progress */
   ,eVolumeMode_LASTITEM
 };
 
