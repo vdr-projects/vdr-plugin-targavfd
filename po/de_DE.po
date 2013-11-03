@@ -2,12 +2,12 @@
 # Copyright (C) Andreas Brachold <vdr07 AT deltab de>
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Andreas Brachold <vdr07 AT deltab de> 2009 - 2013.
+# Andreas Brachold <vdr07 AT deltab de> 2010 - 2013.
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-targavfd-plugin 0.2.2\n"
+"Project-Id-Version: vdr-targavfd-plugin 0.3.0\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2013-10-31 18:08+0100\n"
+"POT-Creation-Date: 2013-11-02 18:11+0100\n"
 "PO-Revision-Date: 2010-07-02 21:25+0200\n"
 "Last-Translator: Andreas Brachold <vdr07 AT deltab de>\n"
 "Language-Team: Andreas Brachold <vdr07 AT deltab de>\n"
@@ -39,6 +39,9 @@ msgstr "Zwei Zeilen"
 
 msgid "Only topic"
 msgstr "Nur Titel"
+
+msgid "Multiple pages"
+msgstr "Mehrere Seiten"
 
 msgid "Render mode"
 msgstr "Anzeigemodus"
@@ -108,4 +111,3 @@ msgstr "Kein aktiver Timer"
 
 msgid "Unknown title"
 msgstr "Unbekannter Titel"
-

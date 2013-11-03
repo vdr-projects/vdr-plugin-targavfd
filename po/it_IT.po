@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-targavfd-plugin 0.0.5\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2013-10-31 18:43+0100\n"
+"POT-Creation-Date: 2013-11-02 18:11+0100\n"
 "PO-Revision-Date: 2010-11-01 22:55+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: \n"
@@ -42,6 +42,9 @@ msgstr "Linee doppie"
 
 msgid "Only topic"
 msgstr "Solo titolo"
+
+msgid "Multiple pages"
+msgstr ""
 
 msgid "Render mode"
 msgstr "Modalità visualizzazione"

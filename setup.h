@@ -38,6 +38,7 @@ enum eRenderMode {
    eRenderMode_SingleLine   /**< Render screen at single line */
   ,eRenderMode_DualLine     /**< Render screen at dual line */
   ,eRenderMode_SingleTopic  /**< Render screen at single line, only names */
+  ,eRenderMode_MultiPage    /**< Render screen at multiple pages */
   ,eRenderMode_LASTITEM
 };
 

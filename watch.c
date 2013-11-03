@@ -1,7 +1,7 @@
 /*
  * targavfd plugin for VDR (C++)
  *
- * (C) 2010 Andreas Brachold <vdr07 AT deltab de>
+ * (C) 2010-2013 Andreas Brachold <vdr07 AT deltab de>
  *
  * This targavfd plugin is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU General Public License as published 
@@ -45,7 +45,7 @@ cVFDWatch::cVFDWatch()
 
   unsigned int n;
   for(n=0;n<memberof(m_nCardIsRecording);++n) {
-      m_nCardIsRecording[n] = 0;  
+      m_nCardIsRecording[n] = 0;
   }
   chPresentTime = 0;
   chFollowingTime = 0;
@@ -63,7 +63,8 @@ cVFDWatch::cVFDWatch()
 
   m_pControl = NULL;
   replayTitle = NULL;
-  replayTitleLast = NULL;
+  replayTitleShort = NULL;
+  replayTitleShortLast = NULL;
   replayTime = NULL;
 
   currentTime = NULL;
@@ -104,9 +105,13 @@ cVFDWatch::~cVFDWatch()
     delete replayTitle;
     replayTitle = NULL;
   }
-  if(replayTitleLast) {
-    delete replayTitleLast;
-    replayTitleLast = NULL;
+  if(replayTitleShort) {
+    delete replayTitleShort;
+    replayTitleShort = NULL;
+  }
+  if(replayTitleShortLast) {
+    delete replayTitleShortLast;
+    replayTitleShortLast = NULL;
   }
   if(replayTime) {
     delete replayTime;
@@ -137,7 +142,7 @@ void cVFDWatch::shutdown(int nExitMode) {
   }
 
   if(this->isopen()) {
-    cTimer* t = Timers.GetNextActiveTimer();    
+    cTimer* t = Timers.GetNextActiveTimer();
 
     switch(nExitMode) {
       case eOnExitMode_NEXTTIMER:
@@ -208,7 +213,8 @@ void cVFDWatch::Action(void)
 
   unsigned int n;
   unsigned int nCnt = 0;
-
+  unsigned int nPage = 0;
+  unsigned int nMaxPages = 0;
   cTimeMs runTime;
   struct tm tm_r;
   bool bLastSuspend = false;
@@ -249,9 +255,11 @@ void cVFDWatch::Action(void)
       }
 
       if(!bSuspend) { 
-          // every second the clock need updates.
-          if((0 == (nCnt % 2))) {
-            bReDraw = CurrentTime(ts);
+          // every 300ms the clock need updates.
+          if((0 == (nCnt % 3))) {
+            bReDraw = ( theSetup.m_nRenderMode == eRenderMode_MultiPage )
+                       ? CurrentTimeHMS(ts)
+                       : CurrentTimeHM(ts);
             if(m_eWatchMode != eLiveTV) {
                bReDraw |= ReplayTime();
             } else {
@@ -260,7 +268,23 @@ void cVFDWatch::Action(void)
             }
         }
 
-        bFlush = RenderScreen(bReDraw);
+        switch(theSetup.m_nRenderMode) {
+          case eRenderMode_SingleLine:
+          case eRenderMode_DualLine:
+          case eRenderMode_SingleTopic:
+            bFlush = RenderScreenSinglePage(bReDraw);
+            break;
+          case eRenderMode_MultiPage:
+            // every 15s the Pages should rotated.
+            if(nMaxPages && (0 == (nCnt % 150))) {
+              nPage ++;
+              nPage %= nMaxPages;
+              m_bUpdateScreen = true;
+            }
+            bFlush = RenderScreenPages(bReDraw, nPage, nMaxPages);
+            break;
+        }
+
         if(m_eWatchMode != eLiveTV) {
             switch(ReplayMode()) {
                 case eReplayNone:
@@ -353,7 +377,7 @@ void cVFDWatch::Action(void)
   dsyslog("targaVFD: watch thread closed (pid=%d)", getpid());
 }
 
-bool cVFDWatch::RenderScreen(bool bReDraw) {
+bool cVFDWatch::RenderScreenSinglePage(bool bReDraw) {
     cString* scRender;
     cString* scHeader = NULL;
     bool bForce = m_bUpdateScreen;
@@ -384,7 +408,7 @@ bool cVFDWatch::RenderScreen(bool bReDraw) {
           bForce = true;
         }
         scHeader = replayTime;
-        scRender = replayTitle;
+        scRender = replayTitleShort;
         bAllowCurrentTime = true;
     }
 
@@ -448,7 +472,107 @@ bool cVFDWatch::RenderScreen(bool bReDraw) {
     return false;
 }
 
-bool cVFDWatch::CurrentTime(time_t ts) {
+bool cVFDWatch::RenderScreenPages(bool bReDraw, unsigned int& nPage, unsigned int& nMaxPages) {
+
+    bool bForce = m_bUpdateScreen;
+
+    if(osdMessage) {
+      nMaxPages = 1;
+      return RenderText(bForce, bReDraw, osdMessage);
+    } else if(osdItem) {
+      nMaxPages = 2;
+      switch(nPage % nMaxPages) {
+        case 0: return RenderText(bForce, bReDraw, osdItem);
+        case 1: return RenderText(bForce, bReDraw, osdTitle);
+      }
+    } else if(m_eWatchMode == eLiveTV) {
+      nMaxPages = 4;
+      if(Program()) {
+        // New program
+        nPage = 3;
+        bForce = true;
+      }
+      // Skip none present items
+      if(nPage == 0 && !chPresentTitle) nPage++;
+      if(nPage == 1 && !chPresentShortTitle) nPage++;
+
+      switch(nPage % nMaxPages) {
+        case 0: return RenderText(bForce, bReDraw, chPresentTitle);
+        case 1: return RenderText(bForce, bReDraw, chPresentShortTitle);
+        case 2: return RenderText(bForce, bReDraw, currentTime);
+        case 3: return RenderText(bForce, bReDraw, chName);
+      }
+
+    } else {
+      nMaxPages = 4;
+      if(Replay()) {
+        // New replay
+        nPage = 0; 
+        bForce = true;
+      }
+      // Skip none present items
+      if(nPage == 0 && !replayTitle) nPage++;
+      if(nPage == 1 && !replayTitleShort) nPage++;
+
+      switch(nPage % nMaxPages) {
+        case 0: return RenderText(bForce, bReDraw, replayTitle);
+        case 1: return RenderText(bForce, bReDraw, replayTitleShort);
+        case 2: return RenderText(bForce, bReDraw, replayTime);
+        case 3: 
+            if(!RenderSpectrumAnalyzer())
+                nPage++; //no span service present
+            return true;
+      }
+    }
+    return false;
+}
+
+bool cVFDWatch::RenderText(bool bForce, bool bReDraw, cString* scText) {
+
+    if(bForce) {
+      m_nScrollOffset = 0;
+      m_bScrollBackward = false;
+      m_bScrollNeeded = true;
+    }
+    if(bForce || bReDraw || m_nScrollOffset > 0 || m_bScrollBackward) {
+      this->clear();
+      if(scText) {
+        int iRet = -1;
+        int nTop = (theSetup.m_cHeight - pFont->Height())/2;
+        iRet = this->DrawText(0 - m_nScrollOffset,nTop<0?0:nTop, *scText);
+        if(m_bScrollNeeded) {
+          switch(iRet) {
+            case 0: 
+              if(m_nScrollOffset <= 0) {
+                m_nScrollOffset = 0;
+                m_bScrollBackward = false;
+                m_bScrollNeeded = false;
+                break; //Fit to screen
+              }
+              m_bScrollBackward = true;
+            case 2:
+            case 1:
+              if(m_bScrollBackward) m_nScrollOffset -= 2;
+              else                  m_nScrollOffset += 2;
+              if(m_nScrollOffset >= 0) {
+                break;
+              }
+            case -1:
+              m_nScrollOffset = 0;
+              m_bScrollBackward = false;
+              m_bScrollNeeded = false;
+              break;
+          }
+        }
+      }
+
+      m_bUpdateScreen = false;
+      return true;
+    }
+    return false;
+}
+
+bool cVFDWatch::CurrentTimeHM(time_t ts) {
 
   if((ts / 60) != (tsCurrentLast / 60)) {
 
@@ -456,23 +580,46 @@ bool cVFDWatch::CurrentTime(time_t ts) {
       delete currentTime;
 
     tsCurrentLast = ts;
-    currentTime = new cString(TimeString(ts));
+    char buf[25];
+    struct tm tm_r;
+    strftime(buf, sizeof(buf), "%R", localtime_r(&ts, &tm_r));
+    currentTime = new cString(buf);
+
     return currentTime != NULL;
   } 
   return false;
 }
 
+bool cVFDWatch::CurrentTimeHMS(time_t ts) {
+
+  if(ts != tsCurrentLast) {
+
+    if(currentTime)
+      delete currentTime;
+
+    tsCurrentLast = ts;
+    char buf[25];
+    struct tm tm_r;
+    strftime(buf, sizeof(buf), "%T", localtime_r(&ts, &tm_r));
+    currentTime = new cString(buf);
+
+    return currentTime != NULL;
+  } 
+  return false;
+}
+
+
 bool cVFDWatch::Replay() {
   
-  if(!replayTitleLast 
-      || !replayTitle 
-      || strcmp(*replayTitleLast,*replayTitle)) {
-    if(replayTitleLast) {
-      delete replayTitleLast;
-      replayTitleLast = NULL;
+  if(!replayTitleShortLast 
+      || !replayTitleShort 
+      || strcmp(*replayTitleShortLast,*replayTitleShort)) {
+    if(replayTitleShortLast) {
+      delete replayTitleShortLast;
+      replayTitleShortLast = NULL;
     }
-    if(replayTitle) {
-      replayTitleLast = new cString(*replayTitle);
+    if(replayTitleShort) {
+      replayTitleShortLast = new cString(*replayTitleShort);
     }
     return true;
   }
@@ -503,6 +650,10 @@ void cVFDWatch::Replaying(const cControl * Control, const char * szName, const c
         if(replayTitle) {
           delete replayTitle;
           replayTitle = NULL;
+        }
+        if(replayTitleShort) {
+          delete replayTitleShort;
+          replayTitleShort = NULL;
         }
         if (szName && !isempty(szName))
         {
@@ -560,6 +711,7 @@ void cVFDWatch::Replaying(const cControl * Control, const char * szName, const c
                             }
                         case '~': {
                             Title = (Name + i + 1);
+                            Name[i] = '\0';
                             i = 0;
                         }
                         default:
@@ -574,14 +726,16 @@ void cVFDWatch::Replaying(const cControl * Control, const char * szName, const c
                 Title = (Name + 10);
             }
             if (Title) {
-                replayTitle = new cString(skipspace(Title));
+                if(Name && strcmp(Title, Name))
+                    replayTitle = new cString(skipspace(Name));
+                replayTitleShort = new cString(skipspace(Title));
             } else {
-                replayTitle = new cString(skipspace(Name));
+                replayTitleShort = new cString(skipspace(Name));
             }
             free(Name);
         }
-        if (!replayTitle) {
-            replayTitle = new cString(tr("Unknown title"));
+        if (!replayTitleShort) {
+            replayTitleShort = new cString(tr("Unknown title"));
         }
     }
     else
@@ -596,7 +750,7 @@ eReplayState cVFDWatch::ReplayMode() const
 {
   bool Play = false, Forward = false;
   int Speed = -1;
-	if (m_pControl
+    if (m_pControl
         && ((cControl *)m_pControl)->GetReplayMode(Play,Forward,Speed))
   {
     // 'Play' tells whether we are playing or pausing, 'Forward' tells whether
@@ -644,7 +798,7 @@ const char * cVFDWatch::FormatReplayTime(int current, int total, double dFrameRa
     int tm = ts / 60;
     ts %= 60;
 
-    if (total > 1) {
+    if (total > 1 && theSetup.m_nRenderMode != eRenderMode_MultiPage) {
       if(g) {
 #if VDRVERSNUM >= 10703
         snprintf(s, sizeof(s), "%s (%s)", (const char*)IndexToHMSF(current,false,dFrameRate), (const char*)IndexToHMSF(total,false,dFrameRate));
@@ -684,7 +838,7 @@ bool cVFDWatch::ReplayTime() {
         if(replayTime)
           delete replayTime;
         replayTime = new cString(sz);
-        return replayTime != NULL;      
+        return replayTime != NULL;
       }
     }
     return false;

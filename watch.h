@@ -1,7 +1,7 @@
 /*
  * targavfd plugin for VDR (C++)
  *
- * (C) 2010 Andreas Brachold <vdr07 AT deltab de>
+ * (C) 2010-2013 Andreas Brachold <vdr07 AT deltab de>
  *
  * This targavfd plugin is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU General Public License as published 
@@ -82,12 +82,13 @@ private:
   int   m_nReplayCurrent;
   int   m_nReplayTotal;
 
-  cString*    osdTitle;
-  cString*    osdItem;
-  cString*    osdMessage;
+  cString* osdTitle;
+  cString* osdItem;
+  cString* osdMessage;
 
   cString* replayTitle;
-  cString* replayTitleLast;
+  cString* replayTitleShort;
+  cString* replayTitleShortLast;
   cString* replayTime;
 
   time_t   tsCurrentLast;
@@ -96,11 +97,14 @@ protected:
   virtual void Action(void);
   bool Program();
   bool Replay();
-  bool RenderScreen(bool bReDraw);
+  bool RenderScreenSinglePage(bool bReDraw);
+  bool RenderScreenPages(bool bReDraw, unsigned int &nPage, unsigned int &nMaxPages);
+  bool RenderText(bool bForce, bool bReDraw, cString* scRender);
   bool RenderSpectrumAnalyzer();
   eReplayState ReplayMode() const;
   bool ReplayPosition(int &current, int &total, double& dFrameRate) const;
-  bool CurrentTime(time_t ts);
+  bool CurrentTimeHM(time_t ts);
+  bool CurrentTimeHMS(time_t ts);
   bool ReplayTime();
   const char * FormatReplayTime(int current, int total, double dFrameRate) const;
 public:

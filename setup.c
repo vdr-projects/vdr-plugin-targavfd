@@ -244,10 +244,11 @@ cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
         &m_tmpSetup.m_nBrightness,
         memberof(szBrightness), szBrightness));
 
-  static const char * szRenderMode[3];
+  static const char * szRenderMode[eRenderMode_LASTITEM];
   szRenderMode[eRenderMode_SingleLine] = tr("Single line");
   szRenderMode[eRenderMode_DualLine] = tr("Dual lines");
   szRenderMode[eRenderMode_SingleTopic] = tr("Only topic");
+  szRenderMode[eRenderMode_MultiPage] = tr("Multiple pages");
 
   Add(new cMenuEditStraItem(tr("Render mode"),                    
         &m_tmpSetup.m_nRenderMode,    

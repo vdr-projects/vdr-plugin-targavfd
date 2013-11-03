@@ -1,6 +1,8 @@
 VDR Plugin 'targavfd' Revision History
 -------------------------------------
 
+2013-xx-xx: Version 0.3.0
+- New render mode - multiple pages
 - New option, show replay progress as bargraph (Request #666)
 - Fix display wrong time for HD recording if they greater than one hour (Bug #1568)
 
