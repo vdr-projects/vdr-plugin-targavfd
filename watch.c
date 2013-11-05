@@ -62,9 +62,9 @@ cVFDWatch::cVFDWatch()
   osdMessage = NULL;
 
   m_pControl = NULL;
+  replayFolder = NULL;
   replayTitle = NULL;
-  replayTitleShort = NULL;
-  replayTitleShortLast = NULL;
+  replayTitleLast = NULL;
   replayTime = NULL;
 
   currentTime = NULL;
@@ -101,17 +101,17 @@ cVFDWatch::~cVFDWatch()
     delete osdItem;
     osdItem = NULL;
   }
+  if(replayFolder) {
+    delete replayFolder;
+    replayFolder = NULL;
+  }
   if(replayTitle) {
     delete replayTitle;
     replayTitle = NULL;
   }
-  if(replayTitleShort) {
-    delete replayTitleShort;
-    replayTitleShort = NULL;
-  }
-  if(replayTitleShortLast) {
-    delete replayTitleShortLast;
-    replayTitleShortLast = NULL;
+  if(replayTitleLast) {
+    delete replayTitleLast;
+    replayTitleLast = NULL;
   }
   if(replayTime) {
     delete replayTime;
@@ -408,7 +408,7 @@ bool cVFDWatch::RenderScreenSinglePage(bool bReDraw) {
           bForce = true;
         }
         scHeader = replayTime;
-        scRender = replayTitleShort;
+        scRender = replayTitle;
         bAllowCurrentTime = true;
     }
 
@@ -493,8 +493,8 @@ bool cVFDWatch::RenderScreenPages(bool bReDraw, unsigned int& nPage, unsigned in
         bForce = true;
       }
       // Skip none present items
-      if(nPage == 0 && !chPresentTitle) nPage++;
-      if(nPage == 1 && !chPresentShortTitle) nPage++;
+      if((nPage % nMaxPages) == 0 && !chPresentTitle) nPage++;
+      if((nPage % nMaxPages) == 1 && !chPresentShortTitle) nPage++;
 
       switch(nPage % nMaxPages) {
         case 0: return RenderText(bForce, bReDraw, chPresentTitle);
@@ -511,12 +511,12 @@ bool cVFDWatch::RenderScreenPages(bool bReDraw, unsigned int& nPage, unsigned in
         bForce = true;
       }
       // Skip none present items
-      if(nPage == 0 && !replayTitle) nPage++;
-      if(nPage == 1 && !replayTitleShort) nPage++;
+      if((nPage % nMaxPages) == 0 && !replayFolder) nPage++;
+      if((nPage % nMaxPages) == 1 && !replayTitle) nPage++;
 
       switch(nPage % nMaxPages) {
-        case 0: return RenderText(bForce, bReDraw, replayTitle);
-        case 1: return RenderText(bForce, bReDraw, replayTitleShort);
+        case 0: return RenderText(bForce, bReDraw, replayFolder);
+        case 1: return RenderText(bForce, bReDraw, replayTitle);
         case 2: return RenderText(bForce, bReDraw, replayTime);
         case 3: 
             if(!RenderSpectrumAnalyzer())
@@ -611,15 +611,15 @@ bool cVFDWatch::CurrentTimeHMS(time_t ts) {
 
 bool cVFDWatch::Replay() {
   
-  if(!replayTitleShortLast 
-      || !replayTitleShort 
-      || strcmp(*replayTitleShortLast,*replayTitleShort)) {
-    if(replayTitleShortLast) {
-      delete replayTitleShortLast;
-      replayTitleShortLast = NULL;
+  if(!replayTitleLast 
+      || !replayTitle 
+      || strcmp(*replayTitleLast,*replayTitle)) {
+    if(replayTitleLast) {
+      delete replayTitleLast;
+      replayTitleLast = NULL;
     }
-    if(replayTitleShort) {
-      replayTitleShortLast = new cString(*replayTitleShort);
+    if(replayTitle) {
+      replayTitleLast = new cString(*replayTitle);
     }
     return true;
   }
@@ -647,13 +647,13 @@ void cVFDWatch::Replaying(const cControl * Control, const char * szName, const c
     {
         m_pControl = (cControl *) Control;
         m_eWatchMode = eReplay;
+        if(replayFolder) {
+          delete replayFolder;
+          replayFolder = NULL;
+        }
         if(replayTitle) {
           delete replayTitle;
           replayTitle = NULL;
-        }
-        if(replayTitleShort) {
-          delete replayTitleShort;
-          replayTitleShort = NULL;
         }
         if (szName && !isempty(szName))
         {
@@ -727,15 +727,15 @@ void cVFDWatch::Replaying(const cControl * Control, const char * szName, const c
             }
             if (Title) {
                 if(Name && strcmp(Title, Name))
-                    replayTitle = new cString(skipspace(Name));
-                replayTitleShort = new cString(skipspace(Title));
+                    replayFolder = new cString(skipspace(Name));
+                replayTitle = new cString(skipspace(Title));
             } else {
-                replayTitleShort = new cString(skipspace(Name));
+                replayTitle = new cString(skipspace(Name));
             }
             free(Name);
         }
-        if (!replayTitleShort) {
-            replayTitleShort = new cString(tr("Unknown title"));
+        if (!replayTitle) {
+            replayTitle = new cString(tr("Unknown title"));
         }
     }
     else

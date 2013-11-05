@@ -86,9 +86,9 @@ private:
   cString* osdItem;
   cString* osdMessage;
 
+  cString* replayFolder;
   cString* replayTitle;
-  cString* replayTitleShort;
-  cString* replayTitleShortLast;
+  cString* replayTitleLast;
   cString* replayTime;
 
   time_t   tsCurrentLast;
