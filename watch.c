@@ -517,7 +517,7 @@ bool cVFDWatch::RenderScreenPages(bool bReDraw, unsigned int& nPage, unsigned in
       switch(nPage % nMaxPages) {
         case 0: return RenderText(bForce, bReDraw, replayFolder);
         case 1: return RenderText(bForce, bReDraw, replayTitle);
-        case 2: return RenderText(bForce, bReDraw, replayTime);
+        case 2: return RenderText(bForce, bReDraw, replayTime ? replayTime : currentTime);
         case 3: 
             if(!RenderSpectrumAnalyzer())
                 nPage++; //no span service present
