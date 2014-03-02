@@ -230,7 +230,7 @@ void cVFDWatch::Action(void)
     if(m_bShutdown)
       break;
     else {
-      cMutexLooker m(mutex);
+      cMutexLooker m(m_Mutex);
       runTime.Set();
 
       time_t ts = time(NULL);
@@ -641,7 +641,7 @@ char *striptitle(char *s)
 
 void cVFDWatch::Replaying(const cControl * Control, const char * szName, const char *FileName, bool On)
 {
-    cMutexLooker m(mutex);
+    cMutexLooker m(m_Mutex);
     m_bUpdateScreen = true;
     if (On)
     {
@@ -846,7 +846,7 @@ bool cVFDWatch::ReplayTime() {
 
 void cVFDWatch::Recording(const cDevice *pDevice, const char *szName, const char *szFileName, bool bOn)
 {
-  cMutexLooker m(mutex);
+  cMutexLooker m(m_Mutex);
 
   unsigned int nCardIndex = pDevice->CardIndex();
   if (nCardIndex > memberof(m_nCardIsRecording) - 1 )
@@ -868,7 +868,7 @@ void cVFDWatch::Recording(const cDevice *pDevice, const char *szName, const char
 
 void cVFDWatch::Channel(int ChannelNumber)
 {
-    cMutexLooker m(mutex);
+    cMutexLooker m(m_Mutex);
     if(chPresentTitle) { 
         delete chPresentTitle;
         chPresentTitle = NULL;
@@ -943,7 +943,7 @@ bool cVFDWatch::Program() {
 
 void cVFDWatch::Volume(int nVolume, bool bAbsolute)
 {
-  cMutexLooker m(mutex);
+  cMutexLooker m(m_Mutex);
 
   int nAbsVolume;
 
@@ -972,7 +972,7 @@ void cVFDWatch::Volume(int nVolume, bool bAbsolute)
 
 
 void cVFDWatch::OsdClear() {
-    cMutexLooker m(mutex);
+    cMutexLooker m(m_Mutex);
     if(osdMessage) { 
         delete osdMessage;
         osdMessage = NULL;
@@ -1005,7 +1005,7 @@ void cVFDWatch::OsdTitle(const char *sz) {
       }
       return;
     }
-    cMutexLooker m(mutex);
+    cMutexLooker m(m_Mutex);
     if(osdTitle) { 
         delete osdTitle;
         osdTitle = NULL;
@@ -1036,7 +1036,7 @@ void cVFDWatch::OsdCurrentItem(const char *sz)
       }
       return;
     }
-    cMutexLooker m(mutex);
+    cMutexLooker m(m_Mutex);
     if(osdItem) { 
         delete osdItem;
         osdItem = NULL;
@@ -1067,7 +1067,7 @@ void cVFDWatch::OsdStatusMessage(const char *sz)
       }
       return;
     }
-    cMutexLooker m(mutex);
+    cMutexLooker m(m_Mutex);
     if(osdMessage) { 
         delete osdMessage;
         osdMessage = NULL;
@@ -1083,7 +1083,7 @@ void cVFDWatch::OsdStatusMessage(const char *sz)
 }
 
 bool cVFDWatch::SetFont(const char *szFont, bool bTwoLineMode, int nBigFontHeight, int nSmallFontHeight) {
-    cMutexLooker m(mutex);
+    cMutexLooker m(m_Mutex);
     if(cVFD::SetFont(szFont, bTwoLineMode, nBigFontHeight, nSmallFontHeight)) {
       m_bUpdateScreen = true;
       return true;

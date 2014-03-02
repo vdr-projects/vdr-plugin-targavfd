@@ -48,7 +48,7 @@ class cVFDWatch
  : public  cVFD
  , protected cThread {
 private:
-  cMutex mutex;
+  cMutex m_Mutex;
 
   volatile bool m_bShutdown;
 
