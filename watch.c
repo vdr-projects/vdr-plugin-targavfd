@@ -539,7 +539,11 @@ bool cVFDWatch::RenderText(bool bForce, bool bReDraw, cString* scText) {
       if(scText) {
         int iRet = -1;
         int nTop = (theSetup.m_cHeight - pFont->Height())/2;
-        iRet = this->DrawText(0 - m_nScrollOffset,nTop<0?0:nTop, *scText);
+        int nAlign = (this->Width() - pFont->Width(*scText)) / 2;
+        if(nAlign < 0) {
+          nAlign = 0;
+        }
+        iRet = this->DrawText(nAlign - m_nScrollOffset,nTop<0?0:nTop, *scText);
         if(m_bScrollNeeded) {
           switch(iRet) {
             case 0: 
