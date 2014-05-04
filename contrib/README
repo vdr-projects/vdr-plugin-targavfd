@@ -1,0 +1,10 @@
+This folder contains a set of sample fonts.
+
+It's not easy to find a nice fonts for the MDM166A and the choices differs 
+between Linux distros.
+
+So, Alexander Grothe <seahawk1986-at-gmx.de> did create some decent fonts 
+especially for the MDM166A, which has been tested in the meantime by several
+users and may be suitable for upstream.
+
+Source : http://projects.vdr-developer.org/issues/1821
