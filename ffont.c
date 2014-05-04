@@ -206,7 +206,7 @@ int cVFDFont::DrawText(cVFDBitmap *Bitmap, int x, int y, const char *s, int Widt
            uchar *buffer = g->Bitmap();
            int symWidth = g->Width();
            if (Width && x + symWidth + g->Left() + kerning - 1 > Width)
-              return 1; // we don't draw partial characters
+              return x; // we don't draw partial characters
            if (x + symWidth + g->Left() + kerning > 0) {
               for (int row = 0; row < g->Rows(); row++) {
                   for (int pitch = 0; pitch < g->Pitch(); pitch++) {
@@ -222,11 +222,11 @@ int cVFDFont::DrawText(cVFDBitmap *Bitmap, int x, int y, const char *s, int Widt
               }
            x += g->AdvanceX() + kerning;
            if (x > Bitmap->Width() - 1)
-              return 1;
+              return x - (g->AdvanceX() + kerning);
            }
-        return 0;
+        return x;
      }
-  return -1;
+  return 0;
 }
 
 

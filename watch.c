@@ -423,11 +423,20 @@ bool cVFDWatch::RenderScreenSinglePage(bool bReDraw) {
       if(scRender) {
     
         int iRet = -1;
+        int w = pFont->Width(*scRender);
         if(theSetup.m_nRenderMode == eRenderMode_DualLine) {
           iRet = this->DrawText(0 - m_nScrollOffset,pFont->Height(), *scRender);
+          if((w - m_nScrollOffset) == iRet)
+            iRet = 0; // Text fits into screen
+          else 
+            iRet = 1; // Text large then screen
         } else {
           int nTop = (theSetup.m_cHeight - pFont->Height())/2;
           iRet = this->DrawText(0 - m_nScrollOffset,nTop<0?0:nTop, *scRender);
+          if((w - m_nScrollOffset) == iRet)
+            iRet = 0; // Text fits into screen
+          else 
+            iRet = 1; // Text large then screen
         }
         if(m_bScrollNeeded) {
           switch(iRet) {
@@ -456,14 +465,13 @@ bool cVFDWatch::RenderScreenSinglePage(bool bReDraw) {
       }
 
       if(scHeader && theSetup.m_nRenderMode == eRenderMode_DualLine) {
+        int t = 0;
         if(bAllowCurrentTime && currentTime) {
-          int t = pFont->Width(*currentTime);
-          int w = pFont->Width(*scHeader);
-          if((w + t + 3) < theSetup.m_cWidth && t < theSetup.m_cWidth) {
-            this->DrawText(theSetup.m_cWidth - t, 0, *currentTime);
-          } 
+          t = pFont->Width(*currentTime);
+          this->DrawText(theSetup.m_cWidth - t, 0, *currentTime);
+          t += 1;
         }
-        this->DrawText(0, 0, *scHeader);
+        this->DrawTextEclipsed(0, 0, *scHeader, theSetup.m_cWidth - t);
       }
 
       m_bUpdateScreen = false;
@@ -539,11 +547,17 @@ bool cVFDWatch::RenderText(bool bForce, bool bReDraw, cString* scText) {
       if(scText) {
         int iRet = -1;
         int nTop = (theSetup.m_cHeight - pFont->Height())/2;
-        int nAlign = (this->Width() - pFont->Width(*scText)) / 2;
+        int w = pFont->Width(*scText);
+        int nAlign = (this->Width() - w) / 2;
         if(nAlign < 0) {
           nAlign = 0;
         }
         iRet = this->DrawText(nAlign - m_nScrollOffset,nTop<0?0:nTop, *scText);
+        if((nAlign + (w - m_nScrollOffset)) == iRet)
+          iRet = 0; // Text fits into screen
+        else 
+          iRet = 1; // Text large then screen
+
         if(m_bScrollNeeded) {
           switch(iRet) {
             case 0: 

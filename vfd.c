@@ -456,11 +456,22 @@ bool cVFD::flush(bool refreshAll)
  * \param y        Vertical character position (row).
  * \param string   String that gets written.
  */
-int cVFD::DrawText(int x, int y, const char* string)
+int cVFD::DrawText(int x, int y, const char* string, int nMaxWidth /* = 1024*/)
 {
   if(pFont && framebuf)
-    return pFont->DrawText(framebuf, x, y, string, 1024);
+    return pFont->DrawText(framebuf, x, y, string, nMaxWidth);
   return -1;
+}
+
+int cVFD::DrawTextEclipsed(int x, int y, const char* string, int nMaxWidth /* = 1024*/)
+{
+  static const char* szEclipse = "..";
+  int d = pFont->Width(szEclipse);
+  int w = this->DrawText(x, y, string, nMaxWidth - d);
+  if(w > 0 && ((w-x) != pFont->Width(string))) {
+     this->DrawText(w, y, szEclipse);
+  }
+  return w;
 }
 
 /**
