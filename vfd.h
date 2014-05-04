@@ -74,6 +74,10 @@ class cVFD : public cVFDQueue {
 	unsigned int lastIconState;
 	unsigned int m_iSizeYb;
 
+  int   m_nScrollOffset;
+  bool  m_bScrollBackward;
+  bool  m_bScrollNeeded;
+
 protected:
   cVFDFont*   pFont;
 
@@ -91,6 +95,11 @@ public:
   void clear ();
   int DrawText(int x, int y, const char* string, int nMaxWidth = 1024);
   int DrawTextEclipsed(int x, int y, const char* string, int nMaxWidth = 1024);
+
+  int DrawTextScrolled(int x, int y, const char* string, bool bCenter);
+  inline bool NeedScrolled() const { return m_nScrollOffset > 0 || m_bScrollBackward; };
+  void RestartScrolled();
+
   int Height() const;
   int Width() const;
   bool Rectangle(int x1, int y1, int x2, int y2, bool filled);

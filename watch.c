@@ -69,10 +69,6 @@ cVFDWatch::cVFDWatch()
 
   currentTime = NULL;
   m_eWatchMode = eLiveTV;
-
-  m_nScrollOffset = -1;
-  m_bScrollBackward = false;
-  m_bScrollNeeded = false;
 }
 
 cVFDWatch::~cVFDWatch()
@@ -414,53 +410,16 @@ bool cVFDWatch::RenderScreenSinglePage(bool bReDraw) {
 
 
     if(bForce) {
-      m_nScrollOffset = 0;
-      m_bScrollBackward = false;
-      m_bScrollNeeded = true;
+      this->RestartScrolled();
     }
-    if(bForce || bReDraw || m_nScrollOffset > 0 || m_bScrollBackward) {
+    if(bForce || bReDraw || this->NeedScrolled()) {
       this->clear();
       if(scRender) {
-    
-        int iRet = -1;
-        int w = pFont->Width(*scRender);
         if(theSetup.m_nRenderMode == eRenderMode_DualLine) {
-          iRet = this->DrawText(0 - m_nScrollOffset,pFont->Height(), *scRender);
-          if((w - m_nScrollOffset) == iRet)
-            iRet = 0; // Text fits into screen
-          else 
-            iRet = 1; // Text large then screen
+          this->DrawTextScrolled(0,pFont->Height(), *scRender, false);
         } else {
           int nTop = (theSetup.m_cHeight - pFont->Height())/2;
-          iRet = this->DrawText(0 - m_nScrollOffset,nTop<0?0:nTop, *scRender);
-          if((w - m_nScrollOffset) == iRet)
-            iRet = 0; // Text fits into screen
-          else 
-            iRet = 1; // Text large then screen
-        }
-        if(m_bScrollNeeded) {
-          switch(iRet) {
-            case 0: 
-              if(m_nScrollOffset <= 0) {
-                m_nScrollOffset = 0;
-                m_bScrollBackward = false;
-                m_bScrollNeeded = false;
-                break; //Fit to screen
-              }
-              m_bScrollBackward = true;
-            case 2:
-            case 1:
-              if(m_bScrollBackward) m_nScrollOffset -= 2;
-              else                  m_nScrollOffset += 2;
-              if(m_nScrollOffset >= 0) {
-                break;
-              }
-            case -1:
-              m_nScrollOffset = 0;
-              m_bScrollBackward = false;
-              m_bScrollNeeded = false;
-              break;
-          }
+          this->DrawTextScrolled(0,nTop<0?0:nTop, *scRender, false);
         }
       }
 
@@ -538,50 +497,13 @@ bool cVFDWatch::RenderScreenPages(bool bReDraw, unsigned int& nPage, unsigned in
 bool cVFDWatch::RenderText(bool bForce, bool bReDraw, cString* scText) {
 
     if(bForce) {
-      m_nScrollOffset = 0;
-      m_bScrollBackward = false;
-      m_bScrollNeeded = true;
+      this->RestartScrolled();
     }
-    if(bForce || bReDraw || m_nScrollOffset > 0 || m_bScrollBackward) {
+    if(bForce || bReDraw || this->NeedScrolled()) {
       this->clear();
       if(scText) {
-        int iRet = -1;
         int nTop = (theSetup.m_cHeight - pFont->Height())/2;
-        int w = pFont->Width(*scText);
-        int nAlign = (this->Width() - w) / 2;
-        if(nAlign < 0) {
-          nAlign = 0;
-        }
-        iRet = this->DrawText(nAlign - m_nScrollOffset,nTop<0?0:nTop, *scText);
-        if((nAlign + (w - m_nScrollOffset)) == iRet)
-          iRet = 0; // Text fits into screen
-        else 
-          iRet = 1; // Text large then screen
-
-        if(m_bScrollNeeded) {
-          switch(iRet) {
-            case 0: 
-              if(m_nScrollOffset <= 0) {
-                m_nScrollOffset = 0;
-                m_bScrollBackward = false;
-                m_bScrollNeeded = false;
-                break; //Fit to screen
-              }
-              m_bScrollBackward = true;
-            case 2:
-            case 1:
-              if(m_bScrollBackward) m_nScrollOffset -= 2;
-              else                  m_nScrollOffset += 2;
-              if(m_nScrollOffset >= 0) {
-                break;
-              }
-            case -1:
-              m_nScrollOffset = 0;
-              m_bScrollBackward = false;
-              m_bScrollNeeded = false;
-              break;
-          }
-        }
+        this->DrawTextScrolled(0,nTop<0?0:nTop,*scText,true);
       }
 
       m_bUpdateScreen = false;
@@ -911,8 +833,7 @@ void cVFDWatch::Channel(int ChannelNumber)
     }
     m_eWatchMode = eLiveTV;
     m_bUpdateScreen = true;
-    m_nScrollOffset = 0;
-    m_bScrollBackward = false;
+    this->RestartScrolled();
 }
 
 bool cVFDWatch::Program() {

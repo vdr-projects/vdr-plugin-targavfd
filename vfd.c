@@ -270,6 +270,10 @@ cVFD::cVFD()
   lastIconState = 0;
   framebuf = NULL;
   backingstore = NULL;
+
+  m_nScrollOffset = -1;
+  m_bScrollBackward = false;
+  m_bScrollNeeded = false;
 }
 
 cVFD::~cVFD() {
@@ -473,6 +477,57 @@ int cVFD::DrawTextEclipsed(int x, int y, const char* string, int nMaxWidth /* = 
   }
   return w;
 }
+
+void cVFD::RestartScrolled() {
+  m_nScrollOffset = 0;
+  m_bScrollBackward = false;
+  m_bScrollNeeded = true;
+}
+
+int cVFD::DrawTextScrolled(int x, int y, const char* string, bool bCenter)
+{
+  int w = pFont->Width(string);
+  int nAlign = 0;
+  if(bCenter) {
+    nAlign = (this->Width() - w) / 2;
+    if(nAlign < 0) {
+      nAlign = 0;
+    }
+  }
+  nAlign += x;
+  int iRet = this->DrawText(nAlign - m_nScrollOffset,y, string);
+  if((nAlign + (w - m_nScrollOffset)) == iRet)
+    iRet = 0; // Text fits into screen
+  else 
+    iRet = 1; // Text large then screen
+
+  if(m_bScrollNeeded) {
+    switch(iRet) {
+      case 0: 
+        if(m_nScrollOffset <= 0) {
+          m_nScrollOffset = 0;
+          m_bScrollBackward = false;
+          m_bScrollNeeded = false;
+          break; //Fit to screen
+        }
+        m_bScrollBackward = true;
+      case 2:
+      case 1:
+        if(m_bScrollBackward) m_nScrollOffset -= 2;
+        else                  m_nScrollOffset += 2;
+        if(m_nScrollOffset >= 0) {
+          break;
+        }
+      case -1:
+        m_nScrollOffset = 0;
+        m_bScrollBackward = false;
+        m_bScrollNeeded = false;
+        break;
+    }
+  }
+  return iRet;
+}
+
 
 /**
  * Height of framebuffer from current device.

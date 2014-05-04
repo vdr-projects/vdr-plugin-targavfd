@@ -54,9 +54,6 @@ private:
 
   eWatchMode m_eWatchMode;
 
-  int   m_nScrollOffset;
-  bool  m_bScrollBackward;
-  bool  m_bScrollNeeded;
   bool  m_bUpdateScreen;
 
   int   m_nCardIsRecording[MAXDEVICES];
