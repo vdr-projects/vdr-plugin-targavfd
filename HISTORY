@@ -5,6 +5,7 @@ VDR Plugin 'targavfd' Revision History
 - New render mode - multiple pages
 - New option, show replay progress as bargraph (Request #666)
 - Dual-Line-Mode: Eclipse long channel names (Request: #1815)
+- Add a set of sample fonts (Request: #1821)
 - Fix display wrong time for HD recording if they greater than one hour (Bug #1568)
 
 2013-04-12: Version 0.2.1
