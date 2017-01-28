@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-targavfd-plugin 0.0.5\n"
+"Project-Id-Version: vdr-targavfd-plugin 0.3.1\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2013-11-02 18:11+0100\n"
+"POT-Creation-Date: 2017-01-28 17:43+0100\n"
 "PO-Revision-Date: 2010-11-01 22:55+0100\n"
 "Last-Translator: Diego Pierotto <vdr-italian@tiscali.it>\n"
 "Language-Team: \n"
@@ -58,6 +58,45 @@ msgstr "Altezza carattere grande"
 msgid "Height of small font"
 msgstr "Altezza carattere piccolo"
 
+msgid "Never"
+msgstr "Mai"
+
+msgid "Only per time"
+msgstr "Solo per l'ora"
+
+msgid "Suspend display at night"
+msgstr "Sospendi schermo la notte"
+
+msgid "Resume on user activities"
+msgstr "Riprendi sulle attività degli utenti"
+
+msgid "No"
+msgstr "No"
+
+msgid "Yes"
+msgstr "Sì"
+
+msgid "Hide icons"
+msgstr "Nascondi icone"
+
+msgid "Beginning of suspend"
+msgstr "Inizio sospensione"
+
+msgid "End time of suspend"
+msgstr "Fine sospensione"
+
+msgid "as volume short time"
+msgstr "il volume grafico a barre, ma solo un breve periodo"
+
+msgid "as volume"
+msgstr "il volume grafico a barre"
+
+msgid "as replay progress"
+msgstr "il grafico a barre riproduzione"
+
+msgid "Show bargraph"
+msgstr "Mostra grafico a barre"
+
 msgid "Do nothing"
 msgstr "Non fare nulla"
 
@@ -76,36 +115,6 @@ msgstr "Mostra solo timer successivo"
 msgid "Exit mode"
 msgstr "Modalità d'uscita"
 
-msgid "Never"
-msgstr "Mai"
-
-msgid "as volume short time"
-msgstr ""
-
-msgid "as volume"
-msgstr ""
-
-msgid "as replay progress"
-msgstr ""
-
-msgid "Show bargraph"
-msgstr ""
-
-msgid "Resume on activities"
-msgstr "Riprendi attività"
-
-msgid "Only per time"
-msgstr "Solo per l'ora"
-
-msgid "Suspend display at night"
-msgstr "Sospendi schermo la notte"
-
-msgid "Beginning of suspend"
-msgstr "Inizio sospensione"
-
-msgid "End time of suspend"
-msgstr "Fine sospensione"
-
 msgid "Control a targa vfd"
 msgstr "Controlla una targa VFD"
 
@@ -114,12 +123,3 @@ msgstr "Nessun timer attivo"
 
 msgid "Unknown title"
 msgstr "Titolo sconosciuto"
-
-#~ msgid "Timed"
-#~ msgstr "Temporizzato"
-
-#~ msgid "Ever"
-#~ msgstr "Sempre"
-
-#~ msgid "Show volume bargraph"
-#~ msgstr "Mostra grafico a barre del volume"

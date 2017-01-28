@@ -1,7 +1,7 @@
 /*
  * targavfd plugin for VDR (C++)
  *
- * (C) 2010-2013 Andreas Brachold <vdr07 AT deltab de>
+ * (C) 2010-2017 Andreas Brachold <vdr07 AT deltab de>
  *
  * This targavfd plugin is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU General Public License as published 
@@ -23,16 +23,16 @@
 #include <vdr/config.h>
 #include <vdr/i18n.h>
 
-#define DEFAULT_ON_EXIT      eOnExitMode_BLANKSCREEN	/**< Blank the device completely */
+#define DEFAULT_ON_EXIT      eOnExitMode_BLANKSCREEN  /**< Blank the device completely */
 #define DEFAULT_BRIGHTNESS   1
 #define DEFAULT_WIDTH        96
 #define DEFAULT_HEIGHT       16
 #define DEFAULT_FONT         "Sans:Bold"
-#define DEFAULT_TWO_LINE_MODE	eRenderMode_SingleLine
+#define DEFAULT_TWO_LINE_MODE  eRenderMode_SingleLine
 #define DEFAULT_BIG_FONT_HEIGHT   14
 #define DEFAULT_SMALL_FONT_HEIGHT 7
-#define DEFAULT_VOLUME_MODE 	eVolumeMode_ShowEver    /**< Show the volume bar ever */
-#define DEFAULT_SUSPEND_MODE 	eSuspendMode_Never      /**< Suspend display never */
+#define DEFAULT_VOLUME_MODE   eVolumeMode_ShowEver    /**< Show the volume bar ever */
+#define DEFAULT_SUSPEND_MODE   eSuspendMode_Never      /**< Suspend display never */
 
 /// The one and only Stored setup data
 cVFDSetup theSetup;
@@ -51,6 +51,8 @@ cVFDSetup::cVFDSetup(void)
   m_nSuspendMode = DEFAULT_SUSPEND_MODE;
   m_nSuspendTimeOn = 2200;
   m_nSuspendTimeOff = 800;
+  m_bSuspend_Timed = 1;   /**< Suspend display, resume short time */
+  m_bSuspend_Icons = 1;   /**< Suspend icons */
 
   strncpy(m_szFont,DEFAULT_FONT,sizeof(m_szFont));
 }
@@ -76,37 +78,39 @@ cVFDSetup& cVFDSetup::operator = (const cVFDSetup& x)
   m_nSuspendTimeOn = x.m_nSuspendTimeOn;
   m_nSuspendTimeOff = x.m_nSuspendTimeOff;
 
+  m_bSuspend_Timed = x.m_bSuspend_Timed;
+  m_bSuspend_Icons = x.m_bSuspend_Icons;
+
   strncpy(m_szFont,x.m_szFont,sizeof(m_szFont));
 
   return *this;
 }
 
-/// compare profilenames and load there value 
+bool cVFDSetup::SetupParseInt(const char *szName, const char *szValue,
+    const char *szKey,
+    const int nMin, const int nMax, const int nDefault,
+    int& nValue) 
+{
+  if(!strcasecmp(szName, szKey)) {
+    int n = atoi(szValue);
+    if ((n < nMin) || (n >= nMax)) {
+        esyslog("targaVFD: %s must be between %d and %d, using default %d",
+               szKey, nMin, nMax-1, nDefault);
+        n = nDefault;
+    }
+    nValue = n;
+    dsyslog("targaVFD: %s set to %d", szKey, nValue);
+    return true;
+  }
+  return false;
+}
+
+/// compare profilenames and load there value
 bool cVFDSetup::SetupParse(const char *szName, const char *szValue)
 {
-  // OnExit
-  if(!strcasecmp(szName, "OnExit")) {
-    int n = atoi(szValue);
-    if ((n < eOnExitMode_SHOWMSG) || (n >= eOnExitMode_LASTITEM)) {
-		    esyslog("targaVFD:  OnExit must be between %d and %d, using default %d",
-		           eOnExitMode_SHOWMSG, eOnExitMode_LASTITEM, DEFAULT_ON_EXIT);
-		    n = DEFAULT_ON_EXIT;
-    }
-    m_nOnExit = n;
-    return true;
-  }
+  if(SetupParseInt(szName, szValue, "OnExit", eOnExitMode_SHOWMSG, eOnExitMode_LASTITEM, DEFAULT_ON_EXIT, m_nOnExit)) { return true; }
+  if(SetupParseInt(szName, szValue, "Brightness", 0, 2, DEFAULT_BRIGHTNESS, m_nBrightness)) { return true; }
 
-  // Brightness
-  if(!strcasecmp(szName, "Brightness")) {
-    int n = atoi(szValue);
-    if ((n < 0) || (n > 2)) {
-		    esyslog("targaVFD:  Brightness must be between 0 and 2, using default %d",
-		           DEFAULT_BRIGHTNESS);
-		    n = DEFAULT_BRIGHTNESS;
-    }
-    m_nBrightness = n;
-    return true;
-  }
   // Font
   if(!strcasecmp(szName, "Font")) {
     if(szValue) {
@@ -114,94 +118,25 @@ bool cVFDSetup::SetupParse(const char *szName, const char *szValue)
       cFont::GetAvailableFontNames(&fontNames);
       if(fontNames.Find(szValue)>=0) {
         strncpy(m_szFont,szValue,sizeof(m_szFont));
+        dsyslog("targaVFD: %s set to %s", szName, m_szFont);
         return true;
       }
     }
-    esyslog("targaVFD:  Font '%s' not found, using default %s", 
-        szValue, DEFAULT_FONT);
+    esyslog("targaVFD:  %s '%s' not found, using default %s",
+        szName, szValue, DEFAULT_FONT);
     strncpy(m_szFont,DEFAULT_FONT,sizeof(m_szFont));
     return true;
   }
-  // BigFont
-  if(!strcasecmp(szName, "BigFont")) {
-    int n = atoi(szValue);
-    if ((n < 5) || (n > 24)) {
-		    esyslog("targaVFD:  BigFont must be between 5 and 24, using default %d",
-		           DEFAULT_BIG_FONT_HEIGHT);
-		    n = DEFAULT_BIG_FONT_HEIGHT;
-    }
-    m_nBigFontHeight = n;
-    return true;
-  }
-  // SmallFont
-  if(!strcasecmp(szName, "SmallFont")) {
-    int n = atoi(szValue);
-    if ((n < 5) || (n > 24)) {
-		    esyslog("targaVFD:  SmallFont must be between 5 and 24, using default %d",
-		           DEFAULT_SMALL_FONT_HEIGHT);
-		    n = DEFAULT_SMALL_FONT_HEIGHT;
-    }
-    m_nSmallFontHeight = n;
-    return true;
-  }
 
-  // Two Line Mode
-  if(!strcasecmp(szName, "TwoLineMode")) {
-    int n = atoi(szValue);
-    if ((n < eRenderMode_SingleLine) || (n >= eRenderMode_LASTITEM)) {
-      esyslog("targaVFD:  TwoLineMode must be between %d and %d, using default %d", 
-              eRenderMode_SingleLine, eRenderMode_LASTITEM, DEFAULT_TWO_LINE_MODE );
-      n = DEFAULT_TWO_LINE_MODE;
-    }
-    m_nRenderMode = n;
-    return true;
-  }
-
-  // VolumeMode
-  if(!strcasecmp(szName, "VolumeMode")) {
-    int n = atoi(szValue);
-    if ((n < eVolumeMode_ShowNever) || (n >= eVolumeMode_LASTITEM)) {
-		    esyslog("targaVFD:  VolumeMode must be between %d and %d, using default %d",
-		           eVolumeMode_ShowNever, eVolumeMode_LASTITEM, DEFAULT_VOLUME_MODE);
-		    n = DEFAULT_VOLUME_MODE;
-    }
-    m_nVolumeMode = n;
-    return true;
-  }
-
-  // SuspendMode
-  if(!strcasecmp(szName, "SuspendMode")) {
-    int n = atoi(szValue);
-    if ((n < eSuspendMode_Never) || (n >= eSuspendMode_LASTITEM)) {
-		    esyslog("targaVFD:  SuspendMode must be between %d and %d, using default %d",
-		           eSuspendMode_Never, eSuspendMode_LASTITEM, DEFAULT_SUSPEND_MODE);
-		    n = DEFAULT_SUSPEND_MODE;
-    }
-    m_nSuspendMode = n;
-    return true;
-  }
-  // SuspendTimeOn
-  if(!strcasecmp(szName, "SuspendTimeOn")) {
-    int n = atoi(szValue);
-    if ((n < 0) || (n >= 2400)) {
-		    esyslog("targaVFD:  SuspendTimeOn must be between %d and %d, using default %d",
-		           0, 2359, 0);
-		    n = 0;
-    }
-    m_nSuspendTimeOn = n;
-    return true;
-  }
-  // SuspendTimeOff
-  if(!strcasecmp(szName, "SuspendTimeOff")) {
-    int n = atoi(szValue);
-    if ((n < 0) || (n >= 2400)) {
-		    esyslog("targaVFD:  SuspendTimeOff must be between %d and %d, using default %d",
-		           0, 2359, 0);
-		    n = 0;
-    }
-    m_nSuspendTimeOff = n;
-    return true;
-  }
+  if(SetupParseInt(szName, szValue, "BigFont", 5, 24, DEFAULT_BIG_FONT_HEIGHT, m_nBigFontHeight)) { return true; }
+  if(SetupParseInt(szName, szValue, "SmallFont", 5, 24, DEFAULT_SMALL_FONT_HEIGHT, m_nSmallFontHeight)) { return true; }
+  if(SetupParseInt(szName, szValue, "TwoLineMode", eRenderMode_SingleLine, eRenderMode_LASTITEM, DEFAULT_TWO_LINE_MODE, m_nRenderMode)) { return true; }
+  if(SetupParseInt(szName, szValue, "VolumeMode", eVolumeMode_ShowNever, eVolumeMode_LASTITEM, DEFAULT_VOLUME_MODE, m_nVolumeMode)) { return true; }
+  if(SetupParseInt(szName, szValue, "SuspendMode", eSuspendMode_Never, eSuspendMode_LASTITEM, DEFAULT_SUSPEND_MODE, m_nSuspendMode)) { return true; }
+  if(SetupParseInt(szName, szValue, "SuspendTimed", 0, 2, 1, m_bSuspend_Timed)) { return true; }
+  if(SetupParseInt(szName, szValue, "SuspendIcons", 0, 2, 1, m_bSuspend_Icons)) { return true; }
+  if(SetupParseInt(szName, szValue, "SuspendTimeOn", 0, 2400, 2200, m_nSuspendTimeOn)) { return true; }
+  if(SetupParseInt(szName, szValue, "SuspendTimeOff", 0, 2400, 800, m_nSuspendTimeOff)) { return true; }
 
   //Unknow parameter
   return false;
@@ -221,11 +156,13 @@ void cVFDMenuSetup::Store(void)
   SetupStore("TwoLineMode",theSetup.m_nRenderMode);
   SetupStore("VolumeMode", theSetup.m_nVolumeMode);
   SetupStore("SuspendMode", theSetup.m_nSuspendMode);
+  SetupStore("SuspendTimed", theSetup.m_bSuspend_Timed);
+  SetupStore("SuspendIcons", theSetup.m_bSuspend_Icons);
   SetupStore("SuspendTimeOn", theSetup.m_nSuspendTimeOn);
   SetupStore("SuspendTimeOff", theSetup.m_nSuspendTimeOff);
 }
 
-cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
+cVFDMenuSetup::cVFDMenuSetup(cVFDWatch* pDev)
 : m_tmpSetup(theSetup)
 , m_pDev(pDev)
 {
@@ -240,7 +177,7 @@ cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
   szBrightness[1] = tr("Half brightness");
   szBrightness[2] = tr("Full brightness");
 
-  Add(new cMenuEditStraItem (tr("Brightness"),           
+  Add(new cMenuEditStraItem (tr("Brightness"),
         &m_tmpSetup.m_nBrightness,
         memberof(szBrightness), szBrightness));
 
@@ -250,18 +187,46 @@ cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
   szRenderMode[eRenderMode_SingleTopic] = tr("Only topic");
   szRenderMode[eRenderMode_MultiPage] = tr("Multiple pages");
 
-  Add(new cMenuEditStraItem(tr("Render mode"),                    
+  Add(new cMenuEditStraItem(tr("Render mode"),
         &m_tmpSetup.m_nRenderMode,    
         memberof(szRenderMode), szRenderMode));
 
-  Add(new cMenuEditStraItem(tr("Default font"),           
+  Add(new cMenuEditStraItem(tr("Default font"),
         &fontIndex, fontNames.Size(), &fontNames[0]));
-  Add(new cMenuEditIntItem (tr("Height of big font"),           
+  Add(new cMenuEditIntItem (tr("Height of big font"),
         &m_tmpSetup.m_nBigFontHeight,        
         5, 24));
-  Add(new cMenuEditIntItem (tr("Height of small font"),           
+  Add(new cMenuEditIntItem (tr("Height of small font"),
         &m_tmpSetup.m_nSmallFontHeight,        
         5, 24));
+
+  static const char * szSuspendMode[eSuspendMode_LASTITEM];
+  szSuspendMode[eSuspendMode_Never] = tr("Never");
+  szSuspendMode[eSuspendMode_Ever]  = tr("Only per time");
+
+  Add(new cMenuEditStraItem (tr("Suspend display at night"),
+        &m_tmpSetup.m_nSuspendMode,
+        memberof(szSuspendMode), szSuspendMode));
+  Add(new cMenuEditBoolItem(tr("Resume on user activities"),
+        &m_tmpSetup.m_bSuspend_Timed,
+        tr("No"), tr("Yes")));
+  Add(new cMenuEditBoolItem(tr("Hide icons"),
+        &m_tmpSetup.m_bSuspend_Icons,
+        tr("No"), tr("Yes")));
+  Add(new cMenuEditTimeItem (tr("Beginning of suspend"),
+        &m_tmpSetup.m_nSuspendTimeOn));
+  Add(new cMenuEditTimeItem (tr("End time of suspend"),
+        &m_tmpSetup.m_nSuspendTimeOff));
+
+  static const char * szVolumeMode[eVolumeMode_LASTITEM];
+  szVolumeMode[eVolumeMode_ShowNever] = tr("Never");
+  szVolumeMode[eVolumeMode_ShowTimed] = tr("as volume short time");
+  szVolumeMode[eVolumeMode_ShowEver]  = tr("as volume");
+  szVolumeMode[eVolumeMode_Progress]  = tr("as replay progress");
+
+  Add(new cMenuEditStraItem (tr("Show bargraph"),
+        &m_tmpSetup.m_nVolumeMode,
+        memberof(szVolumeMode), szVolumeMode));
 
   static const char * szExitModes[eOnExitMode_LASTITEM];
   szExitModes[eOnExitMode_SHOWMSG]      = tr("Do nothing");
@@ -270,33 +235,9 @@ cVFDMenuSetup::cVFDMenuSetup(cVFDWatch*    pDev)
   szExitModes[eOnExitMode_NEXTTIMER]    = tr("Show next timer");
   szExitModes[eOnExitMode_NEXTTIMER_BLANKSCR] = tr("Show only present next timer");
 
-  Add(new cMenuEditStraItem (tr("Exit mode"),           
+  Add(new cMenuEditStraItem (tr("Exit mode"),
         &m_tmpSetup.m_nOnExit,
         memberof(szExitModes), szExitModes));
-
-
-  static const char * szVolumeMode[eVolumeMode_LASTITEM];
-  szVolumeMode[eVolumeMode_ShowNever] = tr("Never");
-  szVolumeMode[eVolumeMode_ShowTimed] = tr("as volume short time");
-  szVolumeMode[eVolumeMode_ShowEver]  = tr("as volume");
-  szVolumeMode[eVolumeMode_Progress]  = tr("as replay progress");
-
-  Add(new cMenuEditStraItem (tr("Show bargraph"),           
-        &m_tmpSetup.m_nVolumeMode,
-        memberof(szVolumeMode), szVolumeMode));
-
-  static const char * szSuspendMode[eSuspendMode_LASTITEM];
-  szSuspendMode[eSuspendMode_Never] = tr("Never");
-  szSuspendMode[eSuspendMode_Timed] = tr("Resume on activities");
-  szSuspendMode[eSuspendMode_Ever]  = tr("Only per time");
-
-  Add(new cMenuEditStraItem (tr("Suspend display at night"),           
-        &m_tmpSetup.m_nSuspendMode,
-        memberof(szSuspendMode), szSuspendMode));
-  Add(new cMenuEditTimeItem (tr("Beginning of suspend"),           
-        &m_tmpSetup.m_nSuspendTimeOn));
-  Add(new cMenuEditTimeItem (tr("End time of suspend"),           
-        &m_tmpSetup.m_nSuspendTimeOff));
 }
 
 eOSState cVFDMenuSetup::ProcessKey(eKeys nKey)
@@ -314,7 +255,7 @@ eOSState cVFDMenuSetup::ProcessKey(eKeys nKey)
                         m_tmpSetup.m_nBigFontHeight, 
                         m_tmpSetup.m_nSmallFontHeight);
     }
-	}
+  }
   return cMenuSetupPage::ProcessKey(nKey);
 }
 

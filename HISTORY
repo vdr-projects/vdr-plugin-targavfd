@@ -1,6 +1,8 @@
 VDR Plugin 'targavfd' Revision History
 -------------------------------------
 
+2017-x-x: Version 0.3.1
+- Add exception for nightly suspend for icons (Request #2459)
 - Update plugin interface for vdr 2.3.2 (Request #2463)
 
 2014-06-14: Version 0.3.0

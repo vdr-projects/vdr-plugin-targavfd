@@ -1,7 +1,7 @@
 /*
  * targavfd plugin for VDR (C++)
  *
- * (C) 2010-2013 Andreas Brachold <vdr07 AT deltab de>
+ * (C) 2010-2017 Andreas Brachold <vdr07 AT deltab de>
  *
  * This targavfd plugin is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU General Public License as published 

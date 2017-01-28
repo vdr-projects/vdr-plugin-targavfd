@@ -2,12 +2,12 @@
 # Copyright (C) Andreas Brachold <vdr07 AT deltab de>
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Andreas Brachold <vdr07 AT deltab de> 2010 - 2013.
+# Andreas Brachold <vdr07 AT deltab de> 2010 - 2017.
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-targavfd-plugin 0.3.0\n"
+"Project-Id-Version: vdr-targavfd-plugin 0.3.1\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2013-11-02 18:11+0100\n"
+"POT-Creation-Date: 2017-01-28 17:43+0100\n"
 "PO-Revision-Date: 2010-07-02 21:25+0200\n"
 "Last-Translator: Andreas Brachold <vdr07 AT deltab de>\n"
 "Language-Team: Andreas Brachold <vdr07 AT deltab de>\n"
@@ -55,6 +55,45 @@ msgstr "Höhe des großen Zeichensatzes"
 msgid "Height of small font"
 msgstr "Höhe des kleinen Zeichensatzes"
 
+msgid "Never"
+msgstr "Nie"
+
+msgid "Only per time"
+msgstr "Gemäß der Zeit"
+
+msgid "Suspend display at night"
+msgstr "Nächtliches Aussetzen der Anzeige"
+
+msgid "Resume on user activities"
+msgstr "Reaktivieren bei Nutzeraktivität"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "Hide icons"
+msgstr "Symbole verbergen"
+
+msgid "Beginning of suspend"
+msgstr "Anfangszeit"
+
+msgid "End time of suspend"
+msgstr "Endzeit"
+
+msgid "as volume short time"
+msgstr "als Lautstärke (kurz)"
+
+msgid "as volume"
+msgstr "als Lautstärke"
+
+msgid "as replay progress"
+msgstr "als Wiedergabefortschritt"
+
+msgid "Show bargraph"
+msgstr "Bargraph anzeigen"
+
 msgid "Do nothing"
 msgstr "Nichts unternehmen"
 
@@ -72,36 +111,6 @@ msgstr "Nur vorhandenen nächsten Timer anzeigen"
 
 msgid "Exit mode"
 msgstr "Ende Modus"
-
-msgid "Never"
-msgstr "Nie"
-
-msgid "as volume short time"
-msgstr "als Lautstärke (kurz)"
-
-msgid "as volume"
-msgstr "als Lautstärke"
-
-msgid "as replay progress"
-msgstr "als Wiedergabefortschritt"
-
-msgid "Show bargraph"
-msgstr "Bargraph anzeigen"
-
-msgid "Resume on activities"
-msgstr "Reaktivieren bei Aktivität"
-
-msgid "Only per time"
-msgstr "Gemäß der Zeit"
-
-msgid "Suspend display at night"
-msgstr "Nächtliches Aussetzen der Anzeige"
-
-msgid "Beginning of suspend"
-msgstr "Anfangszeit"
-
-msgid "End time of suspend"
-msgstr "Endzeit"
 
 msgid "Control a targa vfd"
 msgstr "Steuert ein Targa VFD"

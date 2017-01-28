@@ -1,7 +1,7 @@
 /*
  * targavfd plugin for VDR (C++)
  *
- * (C) 2010-2013 Andreas Brachold <vdr07 AT deltab de>
+ * (C) 2010-2017 Andreas Brachold <vdr07 AT deltab de>
  *
  * This targavfd plugin is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU General Public License as published 
@@ -44,7 +44,6 @@ enum eRenderMode {
 
 enum eSuspendMode {
    eSuspendMode_Never   /**< Suspend display never */
-  ,eSuspendMode_Timed   /**< Suspend display, resume short time */
   ,eSuspendMode_Ever    /**< Suspend display ever */
   ,eSuspendMode_LASTITEM
 };
@@ -70,13 +69,17 @@ struct cVFDSetup
   int          m_nSuspendTimeOn;
   int          m_nSuspendTimeOff;
 
+  int          m_bSuspend_Timed;   /**< Suspend display, resume short time */
+  int          m_bSuspend_Icons;   /**< Suspend icons */
+
   cVFDSetup(void);
   cVFDSetup(const cVFDSetup& x);
   cVFDSetup& operator = (const cVFDSetup& x);
   
   /// Parse our own setup parameters and store their values.
   bool SetupParse(const char *szName, const char *szValue);
-  
+private:
+  bool SetupParseInt(const char *szName, const char *szValue, const char *szKey, const int nMin, const int nMax, const int nDefault, int& nValue);
 };
 
 class cVFDWatch;

@@ -1,7 +1,7 @@
 /*
  * targavfd plugin for VDR (C++)
  *
- * (C) 2010-2013 Andreas Brachold <vdr07 AT deltab de>
+ * (C) 2010-2017 Andreas Brachold <vdr07 AT deltab de>
  *
  * This targavfd plugin is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU General Public License as published 
@@ -240,8 +240,10 @@ void cVFDWatch::Action(void)
       runTime.Set();
 
       time_t ts = time(NULL);
+
       if(theSetup.m_nSuspendMode != eSuspendMode_Never 
           && theSetup.m_nSuspendTimeOff != theSetup.m_nSuspendTimeOn) {
+
         struct tm *now = localtime_r(&ts, &tm_r);
         int clock = now->tm_hour * 100 + now->tm_min;
         if(theSetup.m_nSuspendTimeOff > theSetup.m_nSuspendTimeOn) { //like 8-20
@@ -251,13 +253,16 @@ void cVFDWatch::Action(void)
           bSuspend = (clock >= theSetup.m_nSuspendTimeOn) 
                   || (clock <= theSetup.m_nSuspendTimeOff);
         }
-        if(theSetup.m_nSuspendMode == eSuspendMode_Timed 
+        if(theSetup.m_bSuspend_Timed 
               && !ShutdownHandler.IsUserInactive()) {
           bSuspend = false;
         }
       }
       if(bSuspend != bLastSuspend) {
+				clear();
         bReDraw = true;
+        bFlush= true;
+        bLastSuspend = bSuspend;
       }
 
       if(!bSuspend) { 
@@ -290,6 +295,9 @@ void cVFDWatch::Action(void)
             bFlush = RenderScreenPages(bReDraw, nPage, nMaxPages);
             break;
         }
+     }
+
+     if(!bSuspend || !theSetup.m_bSuspend_Icons) {
 
         if(m_eWatchMode != eLiveTV) {
             switch(ReplayMode()) {
@@ -346,16 +354,12 @@ void cVFDWatch::Action(void)
             default :
              break;
         }
-
-
       }
 
       // Set Brightness if setup value changed or display set to suspend
-      if(theSetup.m_nBrightness != nBrightness || 
-         bSuspend != bLastSuspend) {
+      if(theSetup.m_nBrightness != nBrightness) {
         nBrightness = theSetup.m_nBrightness;
-        Brightness(bSuspend ? 0 : nBrightness);
-        bLastSuspend = bSuspend;
+        Brightness(nBrightness);
         bFlush = true;
       }
 
