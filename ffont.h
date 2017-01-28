@@ -60,7 +60,7 @@ public:
 class cVFDFont : public cFont {
 private:
   int height;
-  int bottom;
+  unsigned int bottom;
   int width;
   FT_Library library; ///< Handle to library
   FT_Face face; ///< Handle to face object
