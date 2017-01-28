@@ -138,7 +138,6 @@ void cVFDWatch::shutdown(int nExitMode) {
   }
 
   if(this->isopen()) {
-    cTimer* t = Timers.GetNextActiveTimer();
 
     switch(nExitMode) {
       case eOnExitMode_NEXTTIMER:
@@ -147,6 +146,17 @@ void cVFDWatch::shutdown(int nExitMode) {
 
         int nTop = (theSetup.m_cHeight - pFont->Height())/2;
         this->clear();
+
+        const cTimer* t = NULL;
+#if APIVERSNUM >= 20302
+        cStateKey lock;
+        if (const cTimers *Timers = cTimers::GetTimersRead(lock)) {
+           t = Timers->GetNextActiveTimer();
+           lock.Remove();
+        }
+#else
+        t = Timers.GetNextActiveTimer();
+#endif
         if(t) {
           struct tm l;
           cString topic;
@@ -822,7 +832,17 @@ void cVFDWatch::Channel(int ChannelNumber)
         chName = NULL;
     }
 
-    cChannel * ch = Channels.GetByNumber(ChannelNumber);
+    const cChannel * ch = NULL;
+#if APIVERSNUM >= 20302
+    cStateKey lock;
+    if (const cChannels *Channels = cChannels::GetChannelsRead(lock)) {
+       ch = Channels->GetByNumber(ChannelNumber);
+       lock.Remove();
+    }
+#else
+    ch = Channels.GetByNumber(ChannelNumber);
+#endif
+
     if(ch) {
       chID = ch->GetChannelID();
       chPresentTime = 0;
@@ -837,44 +857,48 @@ void cVFDWatch::Channel(int ChannelNumber)
 }
 
 bool cVFDWatch::Program() {
-
     bool bChanged = false;
     const cEvent * p = NULL;
-    cSchedulesLock schedulesLock;
-    const cSchedules * schedules = cSchedules::Schedules(schedulesLock);
-    if (chID.Valid() && schedules)
-    {
-        const cSchedule * schedule = schedules->GetSchedule(chID);
-        if (schedule)
-        {
-            if ((p = schedule->GetPresentEvent()) != NULL)
-            {
-                if(chPresentTime && chEventID == p->EventID()) {
-                  return false;
-                }
+#if APIVERSNUM >= 20302
+    cStateKey lock;
+    const cSchedules * schedules = cSchedules::GetSchedulesRead(lock);
+#else
+    cSchedulesLock lock;
+    const cSchedules * schedules = cSchedules::Schedules(lock);
+#endif
+    if (chID.Valid() && schedules) {
+      const cSchedule * schedule = schedules->GetSchedule(chID);
+      if (schedule) {
 
-                bChanged  = true;
-                chEventID = p->EventID();
-                chPresentTime = p->StartTime();
-                chFollowingTime = p->EndTime();
+        if ((p = schedule->GetPresentEvent()) != NULL) {
 
-                if(chPresentTitle) { 
-                    delete chPresentTitle;
-                    chPresentTitle = NULL;
-                }
-                if (!isempty(p->Title())) {
-                    chPresentTitle = new cString(p->Title());
-                }
+            if(chPresentTime && chEventID != p->EventID()) {
+            bChanged  = true;
+            chEventID = p->EventID();
+            chPresentTime = p->StartTime();
+            chFollowingTime = p->EndTime();
 
-                if(chPresentShortTitle) { 
-                    delete chPresentShortTitle;
-                    chPresentShortTitle = NULL;
-                }
-                if (!isempty(p->ShortText())) {
-                    chPresentShortTitle = new cString(p->ShortText());
-                }
+            if(chPresentTitle) {
+              delete chPresentTitle;
+              chPresentTitle = NULL;
             }
+            if (!isempty(p->Title())) {
+              chPresentTitle = new cString(p->Title());
+            }
+
+            if(chPresentShortTitle) {
+              delete chPresentShortTitle;
+              chPresentShortTitle = NULL;
+            }
+            if (!isempty(p->ShortText())) {
+              chPresentShortTitle = new cString(p->ShortText());
+            }
+          }
         }
+      }
+#if APIVERSNUM >= 20302
+      lock.Remove();
+#endif
     }
     return bChanged;
 }

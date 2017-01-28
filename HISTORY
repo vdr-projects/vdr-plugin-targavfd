@@ -1,6 +1,8 @@
 VDR Plugin 'targavfd' Revision History
 -------------------------------------
 
+- Update plugin interface for vdr 2.3.2 (Request #2463)
+
 2014-06-14: Version 0.3.0
 - New render mode - multiple pages
 - New option, show replay progress as bargraph (Request #666)

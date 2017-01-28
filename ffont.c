@@ -58,6 +58,7 @@ cVFDFont::cVFDFont(const char *Name, int CharHeight, int CharWidth)
 {
   height = 0;
   bottom = 0;
+  width = CharWidth;
   int error = FT_Init_FreeType(&library);
   if (!error) {
      error = FT_New_Face(library, Name, 0, &face);
