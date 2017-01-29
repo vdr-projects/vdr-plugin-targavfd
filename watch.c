@@ -872,31 +872,27 @@ bool cVFDWatch::Program() {
 #endif
     if (chID.Valid() && schedules) {
       const cSchedule * schedule = schedules->GetSchedule(chID);
-      if (schedule) {
+      if (schedule && (p = schedule->GetPresentEvent()) != NULL) {
+        if(!chPresentTime || chEventID != p->EventID()) {
+          bChanged  = true;
+          chEventID = p->EventID();
+          chPresentTime = p->StartTime();
+          chFollowingTime = p->EndTime();
 
-        if ((p = schedule->GetPresentEvent()) != NULL) {
+          if(chPresentTitle) {
+            delete chPresentTitle;
+            chPresentTitle = NULL;
+          }
+          if (!isempty(p->Title())) {
+            chPresentTitle = new cString(p->Title());
+          }
 
-            if(chPresentTime && chEventID != p->EventID()) {
-            bChanged  = true;
-            chEventID = p->EventID();
-            chPresentTime = p->StartTime();
-            chFollowingTime = p->EndTime();
-
-            if(chPresentTitle) {
-              delete chPresentTitle;
-              chPresentTitle = NULL;
-            }
-            if (!isempty(p->Title())) {
-              chPresentTitle = new cString(p->Title());
-            }
-
-            if(chPresentShortTitle) {
-              delete chPresentShortTitle;
-              chPresentShortTitle = NULL;
-            }
-            if (!isempty(p->ShortText())) {
-              chPresentShortTitle = new cString(p->ShortText());
-            }
+          if(chPresentShortTitle) {
+            delete chPresentShortTitle;
+            chPresentShortTitle = NULL;
+          }
+          if (!isempty(p->ShortText())) {
+            chPresentShortTitle = new cString(p->ShortText());
           }
         }
       }
