@@ -599,7 +599,11 @@ void cVFDWatch::Replaying(const cControl * Control, const char * szName, const c
     m_bUpdateScreen = true;
     if (On)
     {
-        m_pControl = (cControl *) Control;
+#if APIVERSNUM >= 20302
+        m_pControl = Control;
+#else
+        m_pControl = (cControl *)Control;
+#endif
         m_eWatchMode = eReplay;
         if(replayFolder) {
           delete replayFolder;
@@ -704,9 +708,8 @@ eReplayState cVFDWatch::ReplayMode() const
 {
   bool Play = false, Forward = false;
   int Speed = -1;
-    if (m_pControl
-        && ((cControl *)m_pControl)->GetReplayMode(Play,Forward,Speed))
-  {
+  if (m_pControl 
+      && m_pControl->GetReplayMode(Play,Forward,Speed)) {
     // 'Play' tells whether we are playing or pausing, 'Forward' tells whether
     // we are going forward or backward and 'Speed' is -1 if this is normal
     // play/pause mode, 0 if it is single speed fast/slow forward/back mode
@@ -729,11 +732,12 @@ eReplayState cVFDWatch::ReplayMode() const
 
 bool cVFDWatch::ReplayPosition(int &current, int &total, double& dFrameRate) const
 {
-  if (m_pControl && ((cControl *)m_pControl)->GetIndex(current, total, false)) {
+  if (m_pControl 
+      && m_pControl->GetIndex(current, total, false)) {
+
+    dFrameRate = m_pControl->FramesPerSecond();
     total = (total == 0) ? 1 : total;
-#if VDRVERSNUM >= 10703
-    dFrameRate = ((cControl *)m_pControl)->FramesPerSecond();
-#endif
+
     return true;
   }
   return false;
@@ -754,22 +758,14 @@ const char * cVFDWatch::FormatReplayTime(int current, int total, double dFrameRa
 
     if (total > 1 && theSetup.m_nRenderMode != eRenderMode_MultiPage) {
       if(g) {
-#if VDRVERSNUM >= 10703
         snprintf(s, sizeof(s), "%s (%s)", (const char*)IndexToHMSF(current,false,dFrameRate), (const char*)IndexToHMSF(total,false,dFrameRate));
-#else
-        snprintf(s, sizeof(s), "%s (%s)", (const char*)IndexToHMSF(current), (const char*)IndexToHMSF(total));
-#endif
       } else {
         snprintf(s, sizeof(s), "%02d:%02d (%02d:%02d)", cm, cs, tm, ts);
       } 
     }
     else {
       if(g) {
-#if VDRVERSNUM >= 10703
         snprintf(s, sizeof(s), "%s", (const char*)IndexToHMSF(current,false,dFrameRate));
-#else
-        snprintf(s, sizeof(s), "%s", (const char*)IndexToHMSF(current));
-#endif
       } else {
         snprintf(s, sizeof(s), "%02d:%02d", cm, cs);
       }
@@ -778,12 +774,7 @@ const char * cVFDWatch::FormatReplayTime(int current, int total, double dFrameRa
 }
 
 bool cVFDWatch::ReplayTime() {
-    double dFrameRate;
-#if VDRVERSNUM >= 10701
-    dFrameRate = DEFAULTFRAMESPERSECOND;
-#else
-    dFrameRate = FRAMESPERSEC;
-#endif
+    double dFrameRate = DEFAULTFRAMESPERSECOND;
     m_nReplayCurrent = 0;
     m_nReplayTotal = 0;
     if(ReplayPosition(m_nReplayCurrent,m_nReplayTotal,dFrameRate)) {

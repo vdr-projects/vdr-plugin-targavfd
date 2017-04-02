@@ -62,7 +62,12 @@ private:
   unsigned int m_nIconsForceOff;
   unsigned int m_nIconsForceMask;
 
+#if APIVERSNUM >= 20302
   const cControl *m_pControl;
+#else
+  cControl *m_pControl;
+#endif
+
 
   tChannelID  chID;
   tEventID    chEventID;
