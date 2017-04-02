@@ -259,7 +259,7 @@ void cVFDWatch::Action(void)
         }
       }
       if(bSuspend != bLastSuspend) {
-				clear();
+        clear();
         bReDraw = true;
         bFlush= true;
         bLastSuspend = bSuspend;
@@ -870,35 +870,37 @@ bool cVFDWatch::Program() {
     cSchedulesLock lock;
     const cSchedules * schedules = cSchedules::Schedules(lock);
 #endif
-    if (chID.Valid() && schedules) {
-      const cSchedule * schedule = schedules->GetSchedule(chID);
-      if (schedule && (p = schedule->GetPresentEvent()) != NULL) {
-        if(!chPresentTime || chEventID != p->EventID()) {
-          bChanged  = true;
-          chEventID = p->EventID();
-          chPresentTime = p->StartTime();
-          chFollowingTime = p->EndTime();
+    if (schedules) {
+      if (chID.Valid()) {
+        const cSchedule * schedule = schedules->GetSchedule(chID);
+        if (schedule && (p = schedule->GetPresentEvent()) != NULL) {
+          if(!chPresentTime || chEventID != p->EventID()) {
+            bChanged  = true;
+            chEventID = p->EventID();
+            chPresentTime = p->StartTime();
+            chFollowingTime = p->EndTime();
 
-          if(chPresentTitle) {
-            delete chPresentTitle;
-            chPresentTitle = NULL;
-          }
-          if (!isempty(p->Title())) {
-            chPresentTitle = new cString(p->Title());
-          }
+            if(chPresentTitle) {
+              delete chPresentTitle;
+              chPresentTitle = NULL;
+            }
+            if (!isempty(p->Title())) {
+              chPresentTitle = new cString(p->Title());
+            }
 
-          if(chPresentShortTitle) {
-            delete chPresentShortTitle;
-            chPresentShortTitle = NULL;
-          }
-          if (!isempty(p->ShortText())) {
-            chPresentShortTitle = new cString(p->ShortText());
+            if(chPresentShortTitle) {
+              delete chPresentShortTitle;
+              chPresentShortTitle = NULL;
+            }
+            if (!isempty(p->ShortText())) {
+              chPresentShortTitle = new cString(p->ShortText());
+            }
           }
         }
       }
-#if APIVERSNUM >= 20302
+  #if APIVERSNUM >= 20302
       lock.Remove();
-#endif
+  #endif
     }
     return bChanged;
 }
