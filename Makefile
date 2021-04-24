@@ -54,8 +54,8 @@ SOFILE = libvdr-$(PLUGIN).so
 
 ### Includes and Defines (add further entries here):
 
-INCLUDES += $(shell freetype-config --cflags)
-LIBS += $(shell freetype-config --libs)
+INCLUDES += $(shell pkg-config freetype2 --cflags)
+LIBS += $(shell pkg-config freetype2 --libs)
 
 INCLUDES += $(shell pkg-config --cflags libusb-1.0)
 LIBS += $(shell pkg-config --libs libusb-1.0)
