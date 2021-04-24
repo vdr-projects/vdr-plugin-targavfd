@@ -1,6 +1,8 @@
 VDR Plugin 'targavfd' Revision History
 -------------------------------------
 
+2021-04-24: Version 0.3.2
+- Add patch to support freetype 2.9.1 or higher
 - Update plugin interface for vdr 2.3.3
 - Drop legacy code prior vdr 1.7.3
 
